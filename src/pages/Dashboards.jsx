@@ -52,20 +52,7 @@ export const AdminDashboard = () => {
     return count > 0 ? count : 12;
   }, [storedUsers]);
 
-  const revenueAmount = React.useMemo(() => {
-    try {
-      const savedPayments = localStorage.getItem('achievers_payments');
-      if (savedPayments) {
-        const payments = JSON.parse(savedPayments);
-        const sum = payments.reduce((acc, p) => acc + (p.amount || 0), 0);
-        if (sum >= 100000) {
-          return `₹ ${(sum / 100000).toFixed(1)}L`;
-        }
-        return `₹ ${(sum / 1000).toFixed(1)}K`;
-      }
-    } catch (e) {}
-    return '₹2.4L';
-  }, []);
+
   
   return (
     <div className="space-y-6 animate-in fade-in pb-4">
@@ -83,7 +70,7 @@ export const AdminDashboard = () => {
       </div>
       
       {/* Top Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
         <div className="bg-[#12121A] border border-white/5 rounded-[20px] p-4 md:p-5 relative overflow-hidden group hover:border-gold/30 transition-colors">
           <div className="flex items-center text-white/50 text-[11px] font-bold uppercase tracking-wider mb-2">
             <Users size={14} className="mr-1.5 text-blue-400" /> Total Students
@@ -104,15 +91,7 @@ export const AdminDashboard = () => {
           </div>
         </div>
         
-        <div className="bg-[#12121A] border border-white/5 rounded-[20px] p-4 md:p-5 relative overflow-hidden group hover:border-gold/30 transition-colors">
-          <div className="flex items-center text-white/50 text-[11px] font-bold uppercase tracking-wider mb-2">
-            <IndianRupee size={14} className="mr-1.5 text-[#00FF88]" /> Revenue
-          </div>
-          <div className="text-2xl md:text-3xl font-bold text-white font-space">{revenueAmount}</div>
-          <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
-            <IndianRupee size={80} />
-          </div>
-        </div>
+
         
         <div className="bg-[#12121A] border border-white/5 rounded-[20px] p-4 md:p-5 relative overflow-hidden group hover:border-gold/30 transition-colors">
           <div className="flex items-center text-white/50 text-[11px] font-bold uppercase tracking-wider mb-2">
@@ -192,13 +171,7 @@ export const AdminDashboard = () => {
                 <p className="text-[11px] text-white/40 mt-1 uppercase tracking-wider">10 mins ago</p>
               </div>
             </div>
-            <div className="flex items-start space-x-3 p-3.5 bg-white/5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
-              <div className="p-2.5 bg-[#00FF88]/10 text-[#00FF88] rounded-xl"><IndianRupee size={16} /></div>
-              <div className="flex-1">
-                <p className="text-[#F0F0F0] text-[13px] leading-relaxed">Fee payment of ₹12,000 received from <span className="font-bold text-white">STU2024005</span>.</p>
-                <p className="text-[11px] text-white/40 mt-1 uppercase tracking-wider">1 hour ago</p>
-              </div>
-            </div>
+
             <div className="flex items-start space-x-3 p-3.5 bg-white/5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
               <div className="p-2.5 bg-gold/10 text-gold rounded-xl"><Activity size={16} /></div>
               <div className="flex-1">
@@ -808,15 +781,11 @@ export const ParentDashboard = () => {
         </div>
       </header>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <DashboardCard title="Overall Attendance" value="92%" subtitle="24/26 Classes Attended" />
         <DashboardCard title="Average Score" value="82.5%" subtitle="Across 14 tests" />
         <DashboardCard title="Global Rank" value="#4" subtitle="Top 5% in center" />
-        <div className="glass-card p-6 border-l-4 border-l-[#00FF88]">
-          <h3 className="text-white/60 text-sm font-medium">Fee Status</h3>
-          <div className="text-2xl font-bold text-[#00FF88] mt-2 flex items-center"><CheckCircle size={24} className="mr-2" /> Paid</div>
-          <p className="text-xs text-white/40 mt-1">Next due: Nov 1, 2026</p>
-        </div>
+
       </div>
 
       {/* Attendance Record Button */}

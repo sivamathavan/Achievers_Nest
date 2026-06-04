@@ -37,7 +37,6 @@ const AdminLayout = () => {
       { name: 'Home', path: '/admin', icon: Home, isBottomNav: true, group: 'MAIN' },
       { name: 'Users', path: '/admin/users', icon: Users, isBottomNav: true, group: 'MAIN' },
       { name: 'Batches', path: '/admin/batches', icon: Calendar, isBottomNav: true, group: 'MAIN' },
-      { name: 'Finances', path: '/admin/finances', icon: IndianRupee, isBottomNav: true, group: 'MAIN' },
       { name: 'Reports', path: '/admin/reports', icon: PieChart, isBottomNav: true, group: 'MAIN' },
       { name: 'Q&A Bank', path: '/admin/qa', icon: BookOpen, isBottomNav: false, group: 'MANAGE' },
       { name: 'Alerts', path: '/admin/announcements', icon: Bell, isBottomNav: false, group: 'MANAGE' },

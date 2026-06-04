@@ -18,7 +18,6 @@ const StudentLayout = () => {
     ? [
         { name: 'Home', path: '/parent', icon: Home },
         { name: 'Attendance', path: '/parent/attendance', icon: CheckCircle },
-        { name: 'Fees', path: '/parent/fees', icon: IndianRupee },
         { name: 'Contacts', path: '/parent/contacts', icon: Phone },
       ]
     : [

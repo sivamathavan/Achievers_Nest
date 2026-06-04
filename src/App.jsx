@@ -33,13 +33,11 @@ import ContentUpload from './pages/teacher/ContentUpload';
 import AttendanceMarking from './pages/teacher/AttendanceMarking';
 
 // Parent Pages
-import ParentFees from './pages/parent/ParentFees';
 import ParentContacts from './pages/parent/ParentContacts';
 
 // Admin Pages
 import UserManagement from './pages/admin/UserManagement';
 import BatchManagement from './pages/admin/BatchManagement';
-import FinancialManagement from './pages/admin/FinancialManagement';
 import QAManagement from './pages/admin/QAManagement';
 import ReportsCenter from './pages/admin/ReportsCenter';
 import Announcements from './pages/admin/Announcements';
@@ -59,7 +57,6 @@ const App = () => {
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="batches" element={<BatchManagement />} />
-              <Route path="finances" element={<FinancialManagement />} />
               <Route path="qa" element={<QAManagement />} />
               <Route path="reports" element={<ReportsCenter />} />
               <Route path="announcements" element={<Announcements />} />
@@ -110,7 +107,6 @@ const App = () => {
             <Route element={<StudentLayout />}>
               <Route index element={<ParentDashboard />} />
               <Route path="attendance" element={<ParentAttendance />} />
-              <Route path="fees" element={<ParentFees />} />
               <Route path="contacts" element={<ParentContacts />} />
               <Route path="*" element={<div className="text-white">Under Construction</div>} />
             </Route>
