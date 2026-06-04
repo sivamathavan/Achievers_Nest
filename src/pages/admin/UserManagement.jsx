@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as XLSX from 'xlsx';
-import { UserPlus, Users, Upload, CheckCircle, Copy, MessageCircle, FileDown, Search, Edit, Lock, PowerOff, Filter, Save, X, Trash2, ShieldCheck, Mail, Phone, BookOpen, Clock } from 'lucide-react';
+import { UserPlus, Users, Upload, CheckCircle, Copy, MessageCircle, FileDown, Search, Edit, Lock, PowerOff, Filter, Save, X, Trash2, ShieldCheck, Mail, Phone, BookOpen, Clock, Image as ImageIcon, Award, Calendar, Book } from 'lucide-react';
 
 const initialMockUsers = [
   { id: 'STU2024001', name: 'Rahul Sharma', role: 'Student', class: 'Class 10', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024001', parentName: 'Rajesh Sharma', parentPhone: '919876543210', medium: 'English', language: 'Hindi', board: 'CBSE' },
   { id: 'STU2024002', name: 'Meena S', role: 'Student', class: 'Class 8', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passSTU2024002', parentName: 'Sundar M', parentPhone: '919876543211', medium: 'Tamil', language: 'Tamil', board: 'State Board' },
-  { id: 'TCH001', name: 'John Doe', role: 'Teacher', class: 'Multiple', batch: 'Batch A - Science Kings', status: 'Active', password: 'passTCH001', phone: '919876543220', subjects: 'Physics, Chemistry' },
-  { id: 'TCH002', name: 'Alice Smith', role: 'Teacher', class: 'Multiple', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passTCH002', phone: '919876543221', subjects: 'Mathematics' },
+  { id: 'TCH001', name: 'John Doe', role: 'Teacher', class: 'Multiple', batch: 'Batch A - Science Kings', status: 'Active', password: 'passTCH001', phone: '919876543220', subjects: 'Physics, Chemistry', salary: 45000, salaryStatus: 'Paid (1st Jun)' },
+  { id: 'TCH002', name: 'Alice Smith', role: 'Teacher', class: 'Multiple', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passTCH002', phone: '919876543221', subjects: 'Mathematics', salary: 48000, salaryStatus: 'Paid (1st Jun)' },
   { id: 'STU2024003', name: 'Amit Kumar', role: 'Student', class: 'Class 10', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024003', parentName: 'Kishore Kumar', parentPhone: '919876543212', medium: 'English', language: 'Hindi', board: 'CBSE' },
   { id: 'STU2024004', name: 'Priya Patel', role: 'Student', class: 'Class 10', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passSTU2024004', parentName: 'Dinesh Patel', parentPhone: '919876543213', medium: 'English', language: 'Gujarati', board: 'CBSE' },
   { id: 'STU2024005', name: 'Sneha Reddy', role: 'Student', class: 'Class 12', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024005', parentName: 'Prasad Reddy', parentPhone: '919876543214', medium: 'English', language: 'Telugu', board: 'CBSE' },
@@ -30,12 +30,12 @@ const logActivity = (description, type = 'general') => {
     };
     const updated = [newActivity, ...activities].slice(0, 50);
     localStorage.setItem('achievers_activities', JSON.stringify(updated));
+    window.dispatchEvent(new Event('achievers_activities_updated'));
   } catch (e) {
     console.error('Error logging activity', e);
   }
 };
 
-// Generate next sequential ID for Students
 const generateNextStudentId = (existingUsers) => {
   const existingNums = existingUsers
     .filter(u => u.id && u.id.startsWith('STU'))
@@ -47,7 +47,6 @@ const generateNextStudentId = (existingUsers) => {
   return `STU${maxNum + 1}`;
 };
 
-// Generate next sequential ID for Teachers
 const generateNextTeacherId = (existingUsers) => {
   const existingNums = existingUsers
     .filter(u => u.id && u.id.startsWith('TCH'))
@@ -70,9 +69,10 @@ const UserManagement = () => {
 
   useEffect(() => {
     localStorage.setItem('achievers_users', JSON.stringify(users));
+    window.dispatchEvent(new Event('achievers_users_updated'));
   }, [users]);
 
-  // Load batch options dynamically from local storage
+  // Load batch options dynamically
   const batchOptions = useMemo(() => {
     try {
       const saved = localStorage.getItem('achievers_batches');
@@ -91,7 +91,16 @@ const UserManagement = () => {
   const [teacherForm, setTeacherForm] = useState({ name: '', phone: '', subjects: '', batches: [] });
   
   const [generatedCreds, setGeneratedCreds] = useState(null);
+  
+  // Details Modal and inner tab state
   const [selectedUserDetail, setSelectedUserDetail] = useState(null);
+  const [modalTab, setModalTab] = useState('profile'); // 'profile' | 'academic' | 'salary'
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Editable Teacher Salary state inside modal
+  const [editableSalary, setEditableSalary] = useState('');
+  const [editableSalaryStatus, setEditableSalaryStatus] = useState('');
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -111,7 +120,7 @@ const UserManagement = () => {
     setCurrentPage(1);
   }, [searchQuery, filterRole, filterClass, filterBatch]);
 
-  const fileInputRef = useRef(null);
+  const fileInputRefImport = useRef(null);
 
   const generateRandomPassword = () => Math.random().toString(36).slice(-8);
 
@@ -132,7 +141,8 @@ const UserManagement = () => {
       parentPhone: studentForm.parentPhone,
       batch: studentForm.batch, 
       status: 'Active',
-      password: newPass
+      password: newPass,
+      avatar: ''
     };
 
     setGeneratedCreds({ id: newId, password: newPass, name: studentForm.name, phone: studentForm.parentPhone });
@@ -155,7 +165,10 @@ const UserManagement = () => {
       status: 'Active',
       password: newPass,
       phone: teacherForm.phone,
-      subjects: teacherForm.subjects
+      subjects: teacherForm.subjects,
+      avatar: '',
+      salary: 45000,
+      salaryStatus: 'Paid (1st Jun)'
     };
 
     setGeneratedCreds({ id: newId, password: newPass, name: teacherForm.name, phone: teacherForm.phone });
@@ -175,7 +188,7 @@ const UserManagement = () => {
   const handleDeleteUser = (id) => {
     const target = users.find(u => u.id === id);
     if (!target) return;
-    if (window.confirm(`Are you sure you want to delete user ${target.name} (${id})?`)) {
+    if (window.confirm(`Are you sure you want to deactivate and remove user ${target.name} (${id})?`)) {
       setUsers(users.filter(u => u.id !== id));
       logActivity(`Deleted user account: ${target.name} (${id})`, 'user');
     }
@@ -188,7 +201,7 @@ const UserManagement = () => {
 
   const saveEditUser = () => {
     setUsers(users.map(u => u.id === editingUserId ? { ...u, ...editFormData } : u));
-    logActivity(`Updated user account details for ${editFormData.name || editingUserId}`, 'user');
+    logActivity(`Updated user details for ${editFormData.name || editingUserId}`, 'user');
     setEditingUserId(null);
   };
 
@@ -202,17 +215,153 @@ const UserManagement = () => {
     });
   }, [users, searchQuery, filterRole, filterClass, filterBatch]);
 
-  const shareViaWhatsApp = () => {
-    const text = `Hello ${generatedCreds.name},\nWelcome to Achievers Nest!\nYour Login Details:\nUser ID: ${generatedCreds.id}\nPassword: ${generatedCreds.password}\nPlease login at our website.`;
-    const url = `https://wa.me/${generatedCreds.phone}?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
+  // Click row to show details
+  const openUserDetailsModal = (user) => {
+    setSelectedUserDetail(user);
+    setModalTab('profile');
+    if (user.role === 'Teacher') {
+      setEditableSalary(user.salary || 45000);
+      setEditableSalaryStatus(user.salaryStatus || 'Paid (1st Jun)');
+    }
   };
+
+  // Upload image handler inside modal
+  const handleImageUpload = async (e, userId) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+      
+      if (data.secure_url) {
+        setUsers(prev => prev.map(u => u.id === userId ? { ...u, avatar: data.secure_url } : u));
+        setSelectedUserDetail(prev => ({ ...prev, avatar: data.secure_url }));
+        logActivity(`Uploaded profile image for user (${userId})`, 'user');
+        alert('Profile picture uploaded successfully!');
+      } else {
+        alert('Upload failed: ' + (data.error?.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      alert('Failed to upload image. Please verify Cloudinary credentials in .env.local.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Save editable teacher salary inside modal
+  const saveTeacherSalary = () => {
+    if (!selectedUserDetail) return;
+    const salaryVal = parseInt(editableSalary) || 0;
+    setUsers(prev => prev.map(u => u.id === selectedUserDetail.id ? { ...u, salary: salaryVal, salaryStatus: editableSalaryStatus } : u));
+    setSelectedUserDetail(prev => ({ ...prev, salary: salaryVal, salaryStatus: editableSalaryStatus }));
+    logActivity(`Updated salary details for Teacher ${selectedUserDetail.name} (${selectedUserDetail.id})`, 'user');
+    alert('Salary information updated successfully!');
+  };
+
+  // Calculate dynamic student attendance
+  const studentAttendance = useMemo(() => {
+    if (!selectedUserDetail || selectedUserDetail.role !== 'Student') return { present: 0, total: 0, percentage: null };
+    let present = 0;
+    let total = 0;
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('attendance_')) {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const data = JSON.parse(raw);
+            if (data[selectedUserDetail.id]) {
+              total++;
+              if (data[selectedUserDetail.id] === 'P') {
+                present++;
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    const percentage = total > 0 ? Math.round((present / total) * 100) : null;
+    return { present, total, percentage };
+  }, [selectedUserDetail, users]);
+
+  // Calculate dynamic teacher conduct classes
+  const teacherConductedClassesCount = useMemo(() => {
+    if (!selectedUserDetail || selectedUserDetail.role !== 'Teacher') return 0;
+    let classesConducted = 0;
+    try {
+      const savedBatches = localStorage.getItem('achievers_batches');
+      const batchesList = savedBatches ? JSON.parse(savedBatches) : [];
+      // Get teacher's assigned batch IDs
+      const teacherBatchNames = selectedUserDetail.batch ? selectedUserDetail.batch.split(', ') : [];
+      const teacherBatchIds = batchesList
+        .filter(b => teacherBatchNames.includes(b.name))
+        .map(b => String(b.id));
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('attendance_')) {
+          const parts = key.split('_');
+          const batchId = parts[1];
+          // Check if this attendance key is for one of the teacher's batches
+          if (teacherBatchIds.includes(batchId) || teacherBatchIds.includes(batchId.replace('b', ''))) {
+            classesConducted++;
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return classesConducted;
+  }, [selectedUserDetail, users]);
+
+  // Fetch student test attempts history
+  const studentTestAttempts = useMemo(() => {
+    if (!selectedUserDetail || selectedUserDetail.role !== 'Student') return [];
+    try {
+      const savedResults = localStorage.getItem('achievers_results');
+      if (savedResults) {
+        const resultsList = JSON.parse(savedResults);
+        const filtered = resultsList.filter(
+          r => r.studentId === selectedUserDetail.id || r.studentName === selectedUserDetail.name || r.name === selectedUserDetail.name
+        );
+        if (filtered.length > 0) return filtered;
+      }
+    } catch (e) {}
+    // Fallback Mock test results
+    return [
+      { testName: 'Optics Weekly Test', subject: 'Physics', score: 12, total: 15, percentage: 80, date: '2026-05-28T16:00:00.000Z' },
+      { testName: 'Algebra Chapter 3 Test', subject: 'Mathematics', score: 18, total: 20, percentage: 90, date: '2026-06-05T10:00:00.000Z' }
+    ];
+  }, [selectedUserDetail, users]);
 
   const shareDetailsViaWhatsApp = (userToShare) => {
     const pass = userToShare.password || 'achievers123';
     const text = `Hello ${userToShare.name},\nHere are your login credentials for Achievers Nest:\nUser ID: ${userToShare.id}\nPassword/Passkey: ${pass}\nUrl: https://achieversnest.in`;
     const phone = userToShare.parentPhone || userToShare.phone || '';
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const shareViaWhatsApp = () => {
+    const text = `Hello ${generatedCreds.name},\nWelcome to Achievers Nest!\nYour Login Details:\nUser ID: ${generatedCreds.id}\nPassword: ${generatedCreds.password}\nPlease login at our website.`;
+    const url = `https://wa.me/${generatedCreds.phone}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
 
@@ -458,11 +607,11 @@ const UserManagement = () => {
             </div>
 
             <div className="flex space-x-3 justify-end pt-4 border-t border-white/10">
-              <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleBulkImport} className="hidden" />
+              <input type="file" accept=".xlsx, .xls" ref={fileInputRefImport} onChange={handleBulkImport} className="hidden" />
               <button onClick={downloadTemplate} className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-medium flex items-center text-sm transition-colors">
                 <FileDown size={16} className="mr-2" /> Template
               </button>
-              <button onClick={() => fileInputRef.current?.click()} className="bg-[#00FF88]/20 hover:bg-[#00FF88]/30 text-[#00FF88] px-4 py-2 rounded-lg font-bold flex items-center text-sm transition-colors border border-[#00FF88]/30">
+              <button onClick={() => fileInputRefImport.current?.click()} className="bg-[#00FF88]/20 hover:bg-[#00FF88]/30 text-[#00FF88] px-4 py-2 rounded-lg font-bold flex items-center text-sm transition-colors border border-[#00FF88]/30">
                 <Upload size={16} className="mr-2" /> Bulk Import
               </button>
             </div>
@@ -496,19 +645,28 @@ const UserManagement = () => {
                       <tr 
                         key={user.id} 
                         className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
-                        onClick={() => setSelectedUserDetail(user)}
+                        onClick={() => openUserDetailsModal(user)}
                       >
                         <td className="px-6 py-4 font-mono text-gold">{user.id}</td>
-                        <td className="px-6 py-4 font-medium text-white">
-                          {editingUserId === user.id ? (
-                            <input 
-                              type="text" 
-                              value={editFormData.name} 
-                              onClick={e => e.stopPropagation()}
-                              onChange={e => setEditFormData({...editFormData, name: e.target.value})} 
-                              className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none" 
-                            />
-                          ) : user.name}
+                        <td className="px-6 py-4 font-medium text-white flex items-center space-x-2.5">
+                          <div className="w-7 h-7 rounded-full bg-white/10 overflow-hidden flex items-center justify-center flex-shrink-0 border border-white/5">
+                            {user.avatar ? (
+                              <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-xs text-white/40 font-bold">{user.name.charAt(0)}</span>
+                            )}
+                          </div>
+                          <span>
+                            {editingUserId === user.id ? (
+                              <input 
+                                type="text" 
+                                value={editFormData.name} 
+                                onClick={e => e.stopPropagation()}
+                                onChange={e => setEditFormData({...editFormData, name: e.target.value})} 
+                                className="bg-[#161622] border border-white/20 rounded px-2 py-1 text-sm outline-none text-white focus:border-gold" 
+                              />
+                            ) : user.name}
+                          </span>
                         </td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 rounded text-xs ${user.role === 'Admin' ? 'bg-purple-500/20 text-purple-400' : user.role === 'Teacher' ? 'bg-blue-500/20 text-blue-400' : 'bg-white/10 text-white'}`}>
@@ -521,7 +679,7 @@ const UserManagement = () => {
                                value={editFormData.class} 
                                onClick={e => e.stopPropagation()}
                                onChange={e => setEditFormData({...editFormData, class: e.target.value})} 
-                               className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none w-full max-w-[120px]"
+                               className="bg-[#161622] border border-white/20 rounded px-2 py-1 text-sm outline-none text-white focus:border-gold w-full max-w-[120px]"
                              >
                                {CLASSES.map(c => <option key={c} value={c} className="bg-dark-bg">{c}</option>)}
                              </select>
@@ -538,7 +696,7 @@ const UserManagement = () => {
                               value={editFormData.status} 
                               onClick={e => e.stopPropagation()}
                               onChange={e => setEditFormData({...editFormData, status: e.target.value})} 
-                              className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none"
+                              className="bg-[#161622] border border-white/20 rounded px-2 py-1 text-sm outline-none text-white focus:border-gold"
                             >
                                <option value="Active" className="bg-dark-bg">Active</option>
                                <option value="Inactive" className="bg-dark-bg">Inactive</option>
@@ -600,22 +758,53 @@ const UserManagement = () => {
         </div>
       )}
 
-      {/* USER DETAILS MODAL */}
+      {/* USER DETAILS MODAL (POPUP WITH CLOUDINARY UPLOADER & ACADEMICS/SALARY LOGS) */}
       {selectedUserDetail && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-card max-w-2xl w-full p-6 md:p-8 border border-white/10 animate-in zoom-in-95 duration-200">
+          <div className="glass-card max-w-2xl w-full p-6 md:p-8 border border-white/10 animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar">
+            
+            {/* Modal Header */}
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center text-gold font-bold text-lg border border-gold/25">
-                  {selectedUserDetail.name.charAt(0)}
+                
+                {/* Avatar with Cloudinary Edit Uploader Overlay */}
+                <div className="relative group">
+                  <div className="w-16 h-16 rounded-2xl bg-gold/10 flex items-center justify-center text-gold font-bold text-2xl border border-gold/25 overflow-hidden">
+                    {isUploading ? (
+                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : selectedUserDetail.avatar ? (
+                      <img src={selectedUserDetail.avatar} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{selectedUserDetail.name.charAt(0)}</span>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="absolute -bottom-1 -right-1 w-6 h-6 bg-gold rounded-full flex items-center justify-center text-dark-bg shadow-md hover:scale-110 transition-transform cursor-pointer"
+                    title="Upload profile image"
+                  >
+                    <ImageIcon size={11} />
+                  </button>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    ref={fileInputRef} 
+                    onChange={(e) => handleImageUpload(e, selectedUserDetail.id)} 
+                    className="hidden" 
+                  />
                 </div>
+
                 <div>
-                  <h3 className="text-xl font-bold text-white">{selectedUserDetail.name}</h3>
-                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
-                    selectedUserDetail.role === 'Teacher' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/20' : 'bg-gold/20 text-gold border border-gold/20'
-                  }`}>
-                    {selectedUserDetail.role}
-                  </span>
+                  <h3 className="text-xl font-bold text-white leading-tight">{selectedUserDetail.name}</h3>
+                  <div className="flex space-x-2 mt-1">
+                    <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
+                      selectedUserDetail.role === 'Teacher' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/20' : 'bg-gold/20 text-gold border border-gold/20'
+                    }`}>
+                      {selectedUserDetail.role}
+                    </span>
+                    <span className="text-[10px] text-white/40 font-mono self-center">ID: {selectedUserDetail.id}</span>
+                  </div>
                 </div>
               </div>
               <button 
@@ -626,107 +815,249 @@ const UserManagement = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-b border-white/10 py-6 my-6">
+            {/* Tabs Selector inside modal */}
+            <div className="flex bg-white/5 p-1 rounded-xl mb-6 border border-white/5">
+              <button 
+                onClick={() => setModalTab('profile')} 
+                className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                  modalTab === 'profile' ? 'bg-gold text-dark-bg' : 'text-white/60 hover:text-white'
+                }`}
+              >
+                Profile & Details
+              </button>
               
-              {/* Credentials / System details */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Portal Credentials</h4>
-                <div>
-                  <p className="text-xs text-white/40 mb-0.5">User ID</p>
-                  <p className="text-sm font-mono font-bold text-gold">{selectedUserDetail.id}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-white/40 mb-0.5">Password / Passkey</p>
-                  <p className="text-sm font-mono font-bold text-white bg-white/5 px-2 py-1 rounded inline-block">
-                    {selectedUserDetail.password || 'achievers123'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-white/40 mb-0.5">Account Status</p>
-                  <span className={`inline-flex items-center text-xs font-semibold ${selectedUserDetail.status === 'Active' ? 'text-[#00FF88]' : 'text-red-400'}`}>
-                    <span className={`w-2 h-2 rounded-full mr-1.5 ${selectedUserDetail.status === 'Active' ? 'bg-[#00FF88]' : 'bg-red-400'}`}></span>
-                    {selectedUserDetail.status}
-                  </span>
-                </div>
-              </div>
-
-              {/* Profile Details */}
-              <div className="space-y-4 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
-                <h4 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Profile Information</h4>
-                
-                {selectedUserDetail.role === 'Student' ? (
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-xs text-white/40 mb-0.5">Class</p>
-                        <p className="text-sm text-white font-medium">{selectedUserDetail.class}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-white/40 mb-0.5">Board</p>
-                        <p className="text-sm text-white font-medium">{selectedUserDetail.board || 'CBSE'}</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-xs text-white/40 mb-0.5">Medium</p>
-                        <p className="text-sm text-white font-medium">{selectedUserDetail.medium || 'English'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-white/40 mb-0.5">Language</p>
-                        <p className="text-sm text-white font-medium">{selectedUserDetail.language || 'Tamil'}</p>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs text-white/40 mb-0.5">Parent Details</p>
-                      <p className="text-sm text-white font-medium">{selectedUserDetail.parentName || '—'}</p>
-                      <p className="text-xs text-white/50 mt-0.5 flex items-center">
-                        <Phone size={10} className="mr-1" /> {selectedUserDetail.parentPhone || '—'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-white/40 mb-0.5">Assigned Batch</p>
-                      <p className="text-sm text-gold font-bold">{selectedUserDetail.batch || 'Unassigned'}</p>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <p className="text-xs text-white/40 mb-0.5">Phone Number</p>
-                      <p className="text-sm text-white font-medium flex items-center">
-                        <Phone size={12} className="mr-1 text-white/40" /> {selectedUserDetail.phone || '—'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-white/40 mb-0.5">Subjects Expertise</p>
-                      <p className="text-sm text-white font-medium">{selectedUserDetail.subjects || 'General'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-white/40 mb-0.5">Assigned Batches</p>
-                      <p className="text-sm text-gold font-bold">{selectedUserDetail.batch || 'Unassigned'}</p>
-                    </div>
-                  </>
-                )}
-              </div>
-
+              {selectedUserDetail.role === 'Student' ? (
+                <button 
+                  onClick={() => setModalTab('academic')} 
+                  className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                    modalTab === 'academic' ? 'bg-gold text-dark-bg' : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  Academics & Attendance
+                </button>
+              ) : (
+                <button 
+                  onClick={() => setModalTab('salary')} 
+                  className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                    modalTab === 'salary' ? 'bg-gold text-dark-bg' : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  Salary & Conduct
+                </button>
+              )}
             </div>
 
-            {/* Modal Actions */}
-            <div className="flex space-x-3">
+            {/* Tab 1: Profile Details */}
+            {modalTab === 'profile' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-2">
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-bold text-white/30 uppercase tracking-widest border-b border-white/5 pb-1">Portal Access</h4>
+                  <div>
+                    <p className="text-xs text-white/40">User Login ID</p>
+                    <p className="text-sm font-mono font-bold text-gold mt-0.5">{selectedUserDetail.id}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/40">Password / Passkey</p>
+                    <p className="text-sm font-mono font-bold text-white bg-white/5 px-2.5 py-1 rounded inline-block mt-1">
+                      {selectedUserDetail.password || 'achievers123'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/40">Status</p>
+                    <span className={`inline-flex items-center text-xs font-bold mt-1 ${selectedUserDetail.status === 'Active' ? 'text-[#00FF88]' : 'text-red-400'}`}>
+                      <span className={`w-2 h-2 rounded-full mr-1.5 ${selectedUserDetail.status === 'Active' ? 'bg-[#00FF88]' : 'bg-red-400'}`}></span>
+                      {selectedUserDetail.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-4 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
+                  <h4 className="text-[10px] font-bold text-white/30 uppercase tracking-widest border-b border-white/5 pb-1">Personal Details</h4>
+                  {selectedUserDetail.role === 'Student' ? (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-xs text-white/40">Class</p>
+                          <p className="text-sm text-white font-medium">{selectedUserDetail.class}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-white/40">Board</p>
+                          <p className="text-sm text-white font-medium">{selectedUserDetail.board || 'CBSE'}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-xs text-white/40">Medium</p>
+                          <p className="text-sm text-white font-medium">{selectedUserDetail.medium || 'English'}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-white/40">Language</p>
+                          <p className="text-sm text-white font-medium">{selectedUserDetail.language || 'Tamil'}</p>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs text-white/40">Parent Name</p>
+                        <p className="text-sm text-white font-semibold">{selectedUserDetail.parentName || '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-white/40">Parent Contact</p>
+                        <p className="text-sm text-white font-mono flex items-center mt-0.5">
+                          <Phone size={12} className="mr-1.5 text-white/40" /> {selectedUserDetail.parentPhone || '—'}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <p className="text-xs text-white/40">Contact Phone</p>
+                        <p className="text-sm text-white font-mono flex items-center mt-0.5">
+                          <Phone size={12} className="mr-1.5 text-white/40" /> {selectedUserDetail.phone || '—'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-white/40">Subjects Expertise</p>
+                        <p className="text-sm text-white font-medium mt-0.5">{selectedUserDetail.subjects || 'General'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-white/40">Assigned Batch(es)</p>
+                        <p className="text-sm text-gold font-bold mt-0.5">{selectedUserDetail.batch || 'Unassigned'}</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Tab 2 (Student): Academics & Attendance Logs */}
+            {modalTab === 'academic' && selectedUserDetail.role === 'Student' && (
+              <div className="space-y-6 py-2">
+                
+                {/* Attendance Summary */}
+                <div className="grid grid-cols-3 gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">
+                      {studentAttendance.percentage !== null ? `${studentAttendance.percentage}%` : '—'}
+                    </p>
+                    <p className="text-[10px] text-white/50 uppercase font-medium mt-1">Attendance Rate</p>
+                  </div>
+                  <div className="text-center border-l border-white/10">
+                    <p className="text-2xl font-bold text-[#00FF88]">{studentAttendance.present}</p>
+                    <p className="text-[10px] text-[#00FF88]/70 uppercase font-medium mt-1">Days Present</p>
+                  </div>
+                  <div className="text-center border-l border-white/10">
+                    <p className="text-2xl font-bold text-red-400">{studentAttendance.total - studentAttendance.present}</p>
+                    <p className="text-[10px] text-red-400/70 uppercase font-medium mt-1">Days Absent</p>
+                  </div>
+                </div>
+
+                {/* Test Attempts log list */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold text-white/40 uppercase tracking-wider">Attempted Test History</h4>
+                  
+                  <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
+                    {studentTestAttempts.map((attempt, idx) => (
+                      <div key={idx} className="flex justify-between items-center bg-white/5 border border-white/5 p-3 rounded-xl hover:border-white/10 transition-colors">
+                        <div>
+                          <p className="text-sm font-semibold text-white">{attempt.testName}</p>
+                          <p className="text-[10px] text-white/40 mt-0.5">{attempt.subject} • {attempt.date ? new Date(attempt.date).toLocaleDateString('en-IN') : '—'}</p>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-xs text-white/50">{attempt.score}/{attempt.total}</span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                            attempt.percentage >= 80 ? 'bg-[#00FF88]/20 text-[#00FF88]' :
+                            attempt.percentage >= 50 ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {attempt.percentage}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    {studentTestAttempts.length === 0 && (
+                      <p className="text-center py-6 text-white/40 text-xs">No recorded test attempts.</p>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* Tab 2 (Teacher): Salary Details & Conducting Metrics */}
+            {modalTab === 'salary' && selectedUserDetail.role === 'Teacher' && (
+              <div className="space-y-6 py-2">
+                
+                {/* Conducting Classes stat card */}
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="p-3 bg-gold/10 rounded-xl text-gold"><Calendar size={20} /></div>
+                    <div>
+                      <h4 className="text-sm font-bold text-white">Conducted Classes</h4>
+                      <p className="text-xs text-white/40 mt-0.5">Sessions logged in your batches</p>
+                    </div>
+                  </div>
+                  <span className="text-3xl font-extrabold text-white font-space mr-2">{teacherConductedClassesCount}</span>
+                </div>
+
+                {/* Salary management section */}
+                <div className="glass-card p-5 border border-white/5 space-y-4">
+                  <h4 className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2 flex items-center">
+                    💰 Salary & Finance Administration
+                  </h4>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-white/40 uppercase block mb-1">Monthly Salary (INR)</label>
+                      <input 
+                        type="number" 
+                        value={editableSalary} 
+                        onChange={e => setEditableSalary(e.target.value)} 
+                        className="w-full bg-[#161622] border border-white/10 rounded-xl p-2.5 text-white text-sm focus:border-gold outline-none" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-white/40 uppercase block mb-1">Payment Status</label>
+                      <select 
+                        value={editableSalaryStatus} 
+                        onChange={e => setEditableSalaryStatus(e.target.value)} 
+                        className="w-full bg-[#161622] border border-white/10 rounded-xl p-2.5 text-white text-sm focus:border-gold outline-none"
+                      >
+                        <option className="bg-dark-bg" value="Paid (1st Jun)">Paid (1st Jun)</option>
+                        <option className="bg-dark-bg" value="Paid (June 5th)">Paid (June 5th)</option>
+                        <option className="bg-dark-bg" value="Pending">Pending</option>
+                        <option className="bg-dark-bg" value="Processing">Processing</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={saveTeacherSalary}
+                    className="w-full mt-2 bg-gold hover:bg-gold-hover text-dark-bg font-bold py-2.5 rounded-xl transition-colors text-xs flex items-center justify-center"
+                  >
+                    <Save size={14} className="mr-1.5" /> Save Financial Details
+                  </button>
+                </div>
+
+              </div>
+            )}
+
+            {/* Modal Bottom Buttons */}
+            <div className="flex space-x-3 border-t border-white/10 pt-6 mt-auto">
               <button 
                 onClick={() => copyUserDetails(selectedUserDetail)}
-                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 rounded-xl transition-colors text-sm flex items-center justify-center"
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 rounded-xl transition-colors text-sm flex items-center justify-center cursor-pointer"
               >
-                <Copy size={16} className="mr-2" /> Copy Login Info
+                <Copy size={16} className="mr-2" /> Copy Credentials
               </button>
               {(selectedUserDetail.parentPhone || selectedUserDetail.phone) && (
                 <button 
                   onClick={() => shareDetailsViaWhatsApp(selectedUserDetail)}
-                  className="flex-1 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center"
+                  className="flex-1 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center cursor-pointer"
                 >
-                  <MessageCircle size={16} className="mr-2" /> Share via WhatsApp
+                  <MessageCircle size={16} className="mr-2" /> Send via WhatsApp
                 </button>
               )}
             </div>
+
           </div>
         </div>
       )}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, CheckCircle2, XCircle, Save, Clock, Users, AlertTriangle, Check, Calendar } from 'lucide-react';
 
-const BATCHES = [
+const defaultFallbackBatches = [
   { id: 'b1', name: 'Class 10 CBSE - Morning', time: '4:00 PM – 5:30 PM', students: [
     { id: 'STU001', name: 'Arun Kumar' },
     { id: 'STU002', name: 'Priya Rajesh' },
@@ -61,9 +61,15 @@ function getLowAttendanceAlerts() {
 }
 
 // ─── HISTORY (calendar) VIEW ───────────────────────────────────────────────
-const HistoryView = ({ onBack }) => {
+const HistoryView = ({ onBack, batches = [] }) => {
   const today = new Date();
-  const [batch, setBatch] = useState(BATCHES[0].id);
+  const [batch, setBatch] = useState(() => batches[0]?.id || 'b1');
+
+  useEffect(() => {
+    if (batches.length > 0 && (!batch || !batches.some(b => b.id === batch))) {
+      setBatch(batches[0].id);
+    }
+  }, [batches, batch]);
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
   const alerts = getLowAttendanceAlerts();
@@ -116,7 +122,7 @@ const HistoryView = ({ onBack }) => {
         onChange={e => setBatch(e.target.value)}
         className="w-full bg-[#12121A] border border-[#4F8EF7]/20 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4F8EF7]"
       >
-        {BATCHES.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+        {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
       </select>
 
       {/* Month Navigation */}
@@ -381,11 +387,80 @@ const AttendanceMarking = () => {
   const [step, setStep] = useState('select'); // 'select' | 'mark' | 'history' | 'success'
   const [selectedBatch, setSelectedBatch] = useState(null);
   const [selectedDate, setSelectedDate] = useState(todayStr);
+  const [batches, setBatches] = useState([]);
+
+  useEffect(() => {
+    const savedBatchesRaw = localStorage.getItem('achievers_batches');
+    const savedUsersRaw = localStorage.getItem('achievers_users');
+    
+    let parsedBatches = [];
+    let parsedUsers = [];
+    
+    try {
+      if (savedBatchesRaw) parsedBatches = JSON.parse(savedBatchesRaw);
+    } catch {}
+    
+    try {
+      if (savedUsersRaw) parsedUsers = JSON.parse(savedUsersRaw);
+    } catch {}
+    
+    if (parsedBatches.length === 0) {
+      parsedBatches = [
+        { id: 1, name: 'Batch A - Science Kings', class: 'Class 10', board: 'CBSE', teacher: 'John Doe', capacity: 30, enrolled: 24, schedule: 'Mon-Wed-Fri 10:00 AM', attendance: 85, shift: 'Morning Batch' },
+        { id: 2, name: 'Batch B - Math Wizards', class: 'Class 10', board: 'State Board', teacher: 'Alice Smith', capacity: 25, enrolled: 25, schedule: 'Tue-Thu-Sat 04:00 PM', attendance: 92, shift: 'Evening Batch' },
+      ];
+    }
+    
+    const mapped = parsedBatches.map(batch => {
+      const students = parsedUsers
+        .filter(u => u.role === 'Student' && u.batch === batch.name)
+        .map(u => ({ id: u.id, name: u.name }));
+        
+      let finalStudents = students;
+      if (students.length === 0) {
+        if (batch.name.includes('Science') || batch.id === 1) {
+          finalStudents = parsedUsers
+            .filter(u => u.role === 'Student' && (!u.batch || u.batch.includes('Science') || u.batch.includes('Batch A')))
+            .map(u => ({ id: u.id, name: u.name }));
+        } else {
+          finalStudents = parsedUsers
+            .filter(u => u.role === 'Student' && (!u.batch || u.batch.includes('Math') || u.batch.includes('Batch B')))
+            .map(u => ({ id: u.id, name: u.name }));
+        }
+      }
+      
+      if (finalStudents.length === 0) {
+        if (batch.id === 1 || batch.name.includes('Science') || batch.shift === 'Morning Batch') {
+          finalStudents = [
+            { id: 'STU001', name: 'Arun Kumar' },
+            { id: 'STU002', name: 'Priya Rajesh' },
+            { id: 'STU003', name: 'Karthik Raj' },
+            { id: 'STU004', name: 'Meena S' },
+          ];
+        } else {
+          finalStudents = [
+            { id: 'STU019', name: 'Latha M' },
+            { id: 'STU020', name: 'Mani R' },
+            { id: 'STU021', name: 'Nisha K' },
+          ];
+        }
+      }
+      
+      return {
+        id: String(batch.id),
+        name: batch.name,
+        time: batch.schedule || 'Flexible Time',
+        students: finalStudents
+      };
+    });
+    
+    setBatches(mapped);
+  }, []);
 
   if (step === 'history') {
     return (
       <div className="max-w-2xl mx-auto pb-8">
-        <HistoryView onBack={() => setStep('select')} />
+        <HistoryView onBack={() => setStep('select')} batches={batches} />
       </div>
     );
   }
@@ -432,7 +507,7 @@ const AttendanceMarking = () => {
 
       {/* Batch Cards */}
       <div className="space-y-3">
-        {BATCHES.map(batch => {
+        {batches.map(batch => {
           const local = loadLocally(batch.id, selectedDate);
           const markedCount = Object.keys(local).length;
           const isDone = markedCount === batch.students.length;

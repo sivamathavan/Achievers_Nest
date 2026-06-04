@@ -33,41 +33,83 @@ export const AdminDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const storedUsers = React.useMemo(() => {
+  const [storedUsers, setStoredUsers] = React.useState(() => {
     try {
       const saved = localStorage.getItem('achievers_users');
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
       return [];
     }
+  });
+
+  const [batches, setBatches] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem('achievers_batches');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  const [recentActivitiesList, setRecentActivitiesList] = React.useState([]);
+
+  React.useEffect(() => {
+    const loadData = () => {
+      try {
+        const savedUsers = localStorage.getItem('achievers_users');
+        if (savedUsers) setStoredUsers(JSON.parse(savedUsers));
+
+        const savedBatches = localStorage.getItem('achievers_batches');
+        if (savedBatches) setBatches(JSON.parse(savedBatches));
+
+        const savedActivities = localStorage.getItem('achievers_activities');
+        if (savedActivities) {
+          setRecentActivitiesList(JSON.parse(savedActivities));
+        }
+      } catch (e) {
+        console.error('Error loading dashboard data', e);
+      }
+    };
+    loadData();
+    window.addEventListener('storage', loadData);
+    // Add custom event listener for in-app updates
+    window.addEventListener('achievers_activities_updated', loadData);
+    window.addEventListener('achievers_users_updated', loadData);
+    window.addEventListener('achievers_batches_updated', loadData);
+    
+    return () => {
+      window.removeEventListener('storage', loadData);
+      window.removeEventListener('achievers_activities_updated', loadData);
+      window.removeEventListener('achievers_users_updated', loadData);
+      window.removeEventListener('achievers_batches_updated', loadData);
+    };
   }, []);
 
   const studentCount = React.useMemo(() => {
     const count = storedUsers.filter(u => u.role === 'Student').length;
-    return count > 0 ? count : 245;
+    const hasAnyUsers = storedUsers.length > 0;
+    return hasAnyUsers ? count : 245;
   }, [storedUsers]);
 
   const teacherCount = React.useMemo(() => {
     const count = storedUsers.filter(u => u.role === 'Teacher').length;
-    return count > 0 ? count : 12;
+    const hasAnyUsers = storedUsers.length > 0;
+    return hasAnyUsers ? count : 12;
   }, [storedUsers]);
 
   const activeNow = React.useMemo(() => {
     const todayStr = new Date().toISOString().split('T')[0];
     let count = 0;
-    let batchIds = ['b1', 'b2'];
-    try {
-      const savedBatches = localStorage.getItem('achievers_batches');
-      if (savedBatches) {
-        const parsed = JSON.parse(savedBatches);
-        parsed.forEach(b => {
-          batchIds.push(String(b.id));
-          batchIds.push(`b${b.id}`);
-        });
-      }
-    } catch {}
     
+    let batchIds = [];
+    batches.forEach(b => {
+      batchIds.push(String(b.id));
+      batchIds.push(`b${b.id}`);
+    });
+    
+    batchIds.push('b1', 'b2');
     batchIds = Array.from(new Set(batchIds));
+    
     let attendanceFound = false;
 
     batchIds.forEach(bId => {
@@ -81,7 +123,7 @@ export const AdminDashboard = () => {
       } catch {}
     });
     return attendanceFound ? count : '—';
-  }, []);
+  }, [batches]);
 
   const formatTimeAgo = (isoString) => {
     try {
@@ -99,18 +141,12 @@ export const AdminDashboard = () => {
   };
 
   const recentActivities = React.useMemo(() => {
-    try {
-      const saved = localStorage.getItem('achievers_activities');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.length > 0) return parsed;
-      }
-    } catch {}
+    if (recentActivitiesList.length > 0) return recentActivitiesList;
     return [
       { id: 1, description: 'New student Rahul Sharma enrolled in Class 10 CBSE.', type: 'user', timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString() },
       { id: 2, description: 'Teacher John Doe changed assigned batch details.', type: 'batch', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() }
     ];
-  }, [storedUsers]);
+  }, [recentActivitiesList]);
 
 
   

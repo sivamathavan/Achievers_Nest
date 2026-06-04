@@ -16,6 +16,7 @@ const logActivity = (description, type = 'general') => {
     };
     const updated = [newActivity, ...activities].slice(0, 50);
     localStorage.setItem('achievers_activities', JSON.stringify(updated));
+    window.dispatchEvent(new Event('achievers_activities_updated'));
   } catch (e) {
     console.error('Error logging activity', e);
   }
@@ -73,6 +74,7 @@ const BatchManagement = () => {
 
   useEffect(() => {
     localStorage.setItem('achievers_batches', JSON.stringify(batches));
+    window.dispatchEvent(new Event('achievers_batches_updated'));
   }, [batches]);
 
   // Process batches and dynamically update student counts

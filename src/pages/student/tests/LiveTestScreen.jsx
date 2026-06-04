@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { LayoutGrid, ChevronLeft, ChevronRight, Save } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
 
 const mockQuestions = [
   { id: 1, text: 'What is the speed of light in a vacuum?', options: ['3x10^8 m/s', '3x10^5 m/s', '3x10^2 m/s', '3x10^10 m/s'] },
@@ -15,6 +16,7 @@ const mockQuestions = [
 const LiveTestScreen = () => {
   const { testId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -77,10 +79,12 @@ const LiveTestScreen = () => {
       timeTakenSecs: (15 * 60) - timeLeft,
       date: new Date().toISOString(),
       answers: answersRef.current,
+      studentId: user?.user_id || 'STU2024001',
+      studentName: user?.name || 'Rahul Sharma',
     };
 
     const prev = JSON.parse(localStorage.getItem('achievers_results') || '[]');
-    localStorage.setItem('achievers_results', JSON.stringify([result, ...prev].slice(0, 20)));
+    localStorage.setItem('achievers_results', JSON.stringify([result, ...prev].slice(0, 50)));
     navigate(`/student/tests/results/${resultId}`, { replace: true });
   };
   submitTestRef.current = submitTest;
