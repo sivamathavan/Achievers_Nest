@@ -86,15 +86,11 @@ export const AdminDashboard = () => {
   }, []);
 
   const studentCount = React.useMemo(() => {
-    const count = storedUsers.filter(u => u.role === 'Student').length;
-    const hasAnyUsers = storedUsers.length > 0;
-    return hasAnyUsers ? count : 245;
+    return storedUsers.filter(u => u.role === 'Student').length;
   }, [storedUsers]);
 
   const teacherCount = React.useMemo(() => {
-    const count = storedUsers.filter(u => u.role === 'Teacher').length;
-    const hasAnyUsers = storedUsers.length > 0;
-    return hasAnyUsers ? count : 12;
+    return storedUsers.filter(u => u.role === 'Teacher').length;
   }, [storedUsers]);
 
   const activeNow = React.useMemo(() => {
@@ -110,19 +106,16 @@ export const AdminDashboard = () => {
     batchIds.push('b1', 'b2');
     batchIds = Array.from(new Set(batchIds));
     
-    let attendanceFound = false;
-
     batchIds.forEach(bId => {
       try {
         const raw = localStorage.getItem(`attendance_${bId}_${todayStr}`);
         if (raw) {
-          attendanceFound = true;
           const data = JSON.parse(raw || '{}');
           count += Object.values(data).filter(v => v === 'P').length;
         }
       } catch {}
     });
-    return attendanceFound ? count : '—';
+    return count;
   }, [batches]);
 
   const formatTimeAgo = (isoString) => {
@@ -191,7 +184,7 @@ export const AdminDashboard = () => {
         
         <div className="bg-[#12121A] border border-white/5 rounded-[20px] p-4 md:p-5 relative overflow-hidden group hover:border-gold/30 transition-colors">
           <div className="flex items-center text-white/50 text-[11px] font-bold uppercase tracking-wider mb-2">
-            <Activity size={14} className="mr-1.5 text-gold" /> {activeNow === '—' ? 'Present Today' : 'Active Now'}
+            <Activity size={14} className="mr-1.5 text-gold" /> Active Now
           </div>
           <div className="text-2xl md:text-3xl font-bold text-white font-space">{activeNow}</div>
           <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">

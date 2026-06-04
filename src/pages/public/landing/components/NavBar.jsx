@@ -36,7 +36,11 @@ const NavBar = () => {
   return (
     <nav 
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled || mobileMenuOpen ? 'glass-nav py-3' : 'bg-transparent py-5'
+        mobileMenuOpen 
+          ? 'bg-[#0A0A0F] py-3 border-b border-white/10' 
+          : scrolled 
+            ? 'glass-nav py-3' 
+            : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,12 +79,14 @@ const NavBar = () => {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
-            <button 
-              onClick={() => navigate('/login')}
-              className="bg-gradient-to-r from-gold to-yellow-400 text-dark-bg font-bold p-2 rounded-full flex items-center transition-all glow-gold-hover"
-            >
-              <ArrowRight size={18} />
-            </button>
+            {!mobileMenuOpen && (
+              <button 
+                onClick={() => navigate('/login')}
+                className="bg-gradient-to-r from-gold to-yellow-400 text-dark-bg font-bold p-2 rounded-full flex items-center transition-all glow-gold-hover"
+              >
+                <ArrowRight size={18} />
+              </button>
+            )}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-white p-2 focus:outline-none"
@@ -94,28 +100,39 @@ const NavBar = () => {
       {/* Mobile Menu Panel */}
       <div 
         className={`md:hidden absolute top-full left-0 w-full bg-[#0A0A0F]/95 backdrop-blur-xl border-b border-white/10 transition-all duration-300 overflow-hidden ${
-          mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          mobileMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="px-4 py-4 flex flex-col space-y-4">
+        <div className="px-4 py-4 flex flex-col space-y-3">
           {navLinks.map((link) => (
             <button
               key={link.name}
               onClick={() => handleNavClick(link.href)}
-              className="text-white/80 hover:text-white hover:bg-white/5 font-medium text-lg text-left px-4 py-3 rounded-lg transition-colors"
+              className="text-white/80 hover:text-white hover:bg-white/5 font-medium text-lg text-left px-4 py-2.5 rounded-lg transition-colors"
             >
               {link.name}
             </button>
           ))}
-          <button 
-            onClick={() => {
-              setMobileMenuOpen(false);
-              navigate('/login');
-            }}
-            className="w-full bg-gold/10 border border-gold/30 text-gold font-bold px-4 py-3 rounded-lg flex items-center justify-center mt-2"
-          >
-            Go to Portal <ArrowRight size={18} className="ml-2" />
-          </button>
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <button 
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleNavClick('#enroll');
+              }}
+              className="bg-white/5 border border-white/10 text-white font-bold px-4 py-3 rounded-xl flex items-center justify-center text-sm hover:bg-white/10 transition-all"
+            >
+              Apply Now
+            </button>
+            <button 
+              onClick={() => {
+                setMobileMenuOpen(false);
+                navigate('/login');
+              }}
+              className="bg-gradient-to-r from-gold to-yellow-400 text-dark-bg font-bold px-4 py-3 rounded-xl flex items-center justify-center text-sm hover:scale-[1.02] transition-all shadow-[0_4px_15px_rgba(255,215,0,0.15)]"
+            >
+              Login <ArrowRight size={16} className="ml-1.5" />
+            </button>
+          </div>
         </div>
       </div>
     </nav>
