@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 280" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;display=swap');
+    </style>
+
+    <filter id="amberGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="cyanGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <g id="uniqueNestLogo">
+      <polygon points="0,-45 40,-20 0,5 -40,-20" fill="none" stroke="#FFCC00" stroke-width="6.5" stroke-linejoin="round" filter="url(#amberGlow)"/>
+      <path d="M -25,-5 V 15 L 0,30 L 25,15 V -5" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.25"/>
+      <path d="M 0,-20 L 18,-5 L 12,25" fill="none" stroke="#00FFCC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#cyanGlow)"/>
+      <circle cx="12" cy="25" r="3.5" fill="#FFFFFF"/>
+    </g>
+  </defs>
+
+  <rect width="280" height="280" rx="140" fill="#141419" stroke="#2A2A35" stroke-width="1"/>
+  <circle cx="140" cy="140" r="139" fill="none" stroke="#00FFCC" stroke-width="1" stroke-opacity="0.15" filter="url(#cyanGlow)"/>
+  <use href="#uniqueNestLogo" transform="translate(140, 140) scale(2.2)"/>
+</svg>

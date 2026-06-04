@@ -1,0 +1,69 @@
+@keyframes dnaRotate {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
+.dna-wrapper {
+  perspective: 800px;
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+  overflow: hidden;
+}
+
+.dna-container {
+  animation: dnaRotate 20s linear infinite;
+  transform-style: preserve-3d;
+  position: relative;
+  width: 200px;
+}
+
+.dna-paused {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dna-container {
+    animation-duration: 60s;
+  }
+}
+
+.gene-node {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+/* Ensure the node always faces the camera to look like a sphere/node rather than flat */
+@keyframes counterRotate {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(-360deg); }
+}
+
+.gene-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: counterRotate 20s linear infinite;
+}
+
+.dna-paused .gene-inner {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gene-inner {
+    animation-duration: 60s;
+  }
+}
+
+.strand-connection {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,215,0,0.4), rgba(255,255,255,0.1));
+  transform-style: preserve-3d;
+}

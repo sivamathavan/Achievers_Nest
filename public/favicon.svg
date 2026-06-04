@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <defs>
+    <g id="uniqueNestSolid">
+      <polygon points="0,-22 20,-10 0,2 -20,-10" fill="none" stroke="#FFCC00" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M -12,-2 V 7 L 0,15 L 12,7 V -2" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.4"/>
+      <path d="M 0,-10 L 9,-2 L 6,12" fill="none" stroke="#00FFCC" stroke-width="3"/>
+    </g>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="#141419" stroke="#2A2A35" stroke-width="1.2"/>
+  <use href="#uniqueNestSolid" transform="translate(32, 32) scale(1.1)"/>
+</svg>

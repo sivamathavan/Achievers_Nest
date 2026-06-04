@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1150" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;family=JetBrains+Mono:wght@300;400;500&amp;family=Noto+Sans+Tamil:wght@400;500;700&amp;display=swap');
+      
+      .brand-title-1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 52px; fill: #FFFFFF; letter-spacing: -0.5px; }
+      .brand-title-2 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 52px; fill: #FFCC00; letter-spacing: -0.5px; }
+      .label-text { font-family: 'JetBrains Mono', monospace; font-weight: 400; font-size: 14px; fill: #8E8E9F; letter-spacing: 2px; }
+      
+      /* Card Typography */
+      .card-title-main { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 28px; fill: #FFFFFF; letter-spacing: -0.5px; }
+      .card-sub-caps { font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 9px; fill: #FFCC00; letter-spacing: 1.5px; }
+      .card-body-bold { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; fill: #FFFFFF; }
+      .card-body-text { font-family: 'JetBrains Mono', monospace; font-weight: 400; font-size: 10px; fill: #A1A1AF; }
+      .card-body-highlight { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 10.5px; fill: #00FFCC; }
+      .tamil-tagline { font-family: 'Noto Sans Tamil', sans-serif; font-weight: 500; font-size: 8.5px; fill: #8E8E9F; letter-spacing: 0.1px; }
+
+      /* Signage Typography */
+      .sign-title-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 42px; fill: #FFFFFF; letter-spacing: -1px; }
+    </style>
+
+    <filter id="amberGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="cyanGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <g id="uniqueNestLogo">
+      <polygon points="0,-45 40,-20 0,5 -40,-20" fill="none" stroke="#FFCC00" stroke-width="6.5" stroke-linejoin="round" filter="url(#amberGlow)"/>
+      <path d="M -25,-5 V 15 L 0,30 L 25,15 V -5" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.25"/>
+      <path d="M 0,-20 L 18,-5 L 12,25" fill="none" stroke="#00FFCC" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#cyanGlow)"/>
+      <circle cx="12" cy="25" r="3.5" fill="#FFFFFF"/>
+    </g>
+
+    <g id="uniqueNestSolid">
+      <polygon points="0,-22 20,-10 0,2 -20,-10" fill="none" stroke="#FFCC00" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M -12,-2 V 7 L 0,15 L 12,7 V -2" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.4"/>
+      <path d="M 0,-10 L 9,-2 L 6,12" fill="none" stroke="#00FFCC" stroke-width="3"/>
+    </g>
+
+    <g id="customQR">
+      <rect width="75" height="75" fill="#0C0C0F" stroke="#FFCC00" stroke-width="1.5" rx="6"/>
+      <rect x="7" y="7" width="18" height="18" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+      <rect x="12" y="12" width="8" height="8" fill="#FFCC00"/>
+      <rect x="50" y="7" width="18" height="18" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+      <rect x="55" y="12" width="8" height="8" fill="#00FFCC"/>
+      <rect x="7" y="50" width="18" height="18" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+      <rect x="12" y="55" width="8" height="8" fill="#FFCC00"/>
+      <g fill="#FFFFFF">
+        <rect x="29" y="7" width="4" height="8"/>
+        <rect x="38" y="11" width="6" height="4"/>
+        <rect x="29" y="19" width="4" height="4"/>
+        <rect x="38" y="21" width="4" height="8"/>
+        <rect x="7" y="29" width="8" height="4"/>
+        <rect x="19" y="37" width="4" height="6"/>
+        <rect x="27" y="33" width="6" height="4"/>
+        <rect x="38" y="33" width="12" height="4"/>
+        <rect x="54" y="29" width="4" height="8"/>
+        <rect x="62" y="37" width="4" height="4"/>
+        <rect x="29" y="45" width="4" height="6"/>
+        <rect x="38" y="45" width="8" height="4"/>
+        <rect x="50" y="49" width="4" height="12"/>
+        <rect x="58" y="45" width="8" height="4"/>
+      </g>
+    </g>
+  </defs>
+
+  <rect width="1400" height="1150" fill="#0C0C0E"/>
+
+  <g transform="translate(50, 50)">
+    <rect width="400" height="460" fill="none" stroke="#2A2A35" stroke-width="1" opacity="0.4"/>
+    <g transform="translate(40, 40) scale(0.625)">
+      <rect width="512" height="512" rx="115" fill="#141419" stroke="#2A2A35" stroke-width="1.5"/>
+      <rect x="4" y="4" width="504" height="504" rx="111" fill="none" stroke="#FFCC00" stroke-width="1.5" stroke-opacity="0.25" filter="url(#amberGlow)"/>
+      <use href="#uniqueNestLogo" transform="translate(256, 256) scale(3.2)"/>
+    </g>
+    <text x="40" y="415" class="label-text">WEB/APP CONTAINER <tspan fill="#5A5A6A">(512x512 px)</tspan></text>
+  </g>
+
+  <g transform="translate(500, 50)">
+    <rect width="400" height="460" fill="none" stroke="#2A2A35" stroke-width="1" opacity="0.4"/>
+    <rect x="60" y="60" width="280" height="280" rx="140" fill="#141419" stroke="#2A2A35" stroke-width="1"/>
+    <circle cx="200" cy="200" r="139" fill="none" stroke="#00FFCC" stroke-width="1" stroke-opacity="0.15" filter="url(#cyanGlow)"/>
+    <use href="#uniqueNestLogo" transform="translate(200, 200) scale(2.2)"/>
+    <text x="40" y="415" class="label-text">GEOMETRIC AVATAR / EMBLEM</text>
+  </g>
+
+  <g transform="translate(950, 50)">
+    <rect width="400" height="460" fill="none" stroke="#2A2A35" stroke-width="1" opacity="0.4"/>
+    <g transform="translate(90, 140)">
+      <rect width="64" height="64" rx="14" fill="#141419" stroke="#2A2A35" stroke-width="1.2"/>
+      <use href="#uniqueNestSolid" transform="translate(32, 32) scale(1.1)"/>
+      <text x="32" y="92" font-family="'JetBrains Mono', monospace" font-size="11" fill="#8E8E9F" text-anchor="middle">64x64</text>
+    </g>
+    <g transform="translate(240, 156)">
+      <rect width="32" height="32" rx="7" fill="#141419" stroke="#2A2A35" stroke-width="1"/>
+      <use href="#uniqueNestSolid" transform="translate(16, 16) scale(0.55)"/>
+      <text x="16" y="74" font-family="'JetBrains Mono', monospace" font-size="11" fill="#8E8E9F" text-anchor="middle">32x32</text>
+    </g>
+    <text x="40" y="415" class="label-text">RESPONSIVE FAVICON ENGINE</text>
+  </g>
+
+  <line x1="50" y1="560" x2="1350" y2="560" stroke="#2A2A35" stroke-width="1" opacity="0.2"/>
+
+  <g transform="translate(50, 610)">
+    <rect width="610" height="490" fill="none" stroke="#2A2A35" stroke-width="1" opacity="0.4"/>
+    
+    <g transform="translate(40, 30) scale(0.72)">
+      <rect width="360" height="210" rx="16" fill="#141419" stroke="#FFCC00" stroke-width="1" stroke-opacity="0.2"/>
+      <path d="M 0,198 L 360,198" stroke="#FFCC00" stroke-width="2" opacity="0.8"/>
+      <use href="#uniqueNestLogo" transform="translate(45, 45) scale(0.4)"/>
+      <text x="40" y="125">
+        <tspan class="card-title-main">ACHIEVERS</tspan>
+        <tspan class="card-title-main" fill="#FFCC00">NEST</tspan>
+      </text>
+      <text x="42" y="155" class="card-sub-caps">CLASS 1-12 EXPERT COACHING HUB</text>
+    </g>
+
+    <g transform="translate(40, 210) scale(0.72)">
+      <rect width="360" height="210" rx="16" fill="#0C0C0F" stroke="#2A2A35" stroke-width="1.5"/>
+      <line x1="215" y1="15" x2="215" y2="150" stroke="#2A2A35" stroke-width="1"/>
+      <line x1="18" y1="150" x2="342" y2="150" stroke="#2A2A35" stroke-width="1"/>
+      <text x="18" y="38" class="card-body-bold">Admissions &amp; Info</text>
+      <text x="18" y="53" class="card-body-highlight">COIMBATORE'S #1 TUITION CENTRE</text>
+      <g transform="translate(18, 76)">
+        <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="9" fill="#FFCC00">Call:</text>
+        <text x="35" y="0" class="card-body-text" fill="#FFFFFF">+91 63829 87874</text>
+        <text x="35" y="12" class="card-body-text" fill="#FFFFFF">+91 63811 69124</text>
+        <text x="0" y="32" font-family="'JetBrains Mono', monospace" font-size="9" fill="#00FFCC">WA:</text>
+        <text x="35" y="32" class="card-body-text" fill="#FFFFFF">+91 63811 69124</text>
+        <text x="0" y="52" font-family="'JetBrains Mono', monospace" font-size="9" fill="#8E8E9F">Mail:</text>
+        <text x="35" y="52" class="card-body-text" font-size="8.5px">achieversnest@gmail.com</text>
+      </g>
+      <g transform="translate(245, 22)">
+        <use href="#customQR" transform="scale(0.9)"/>
+        <text x="34" y="82" font-family="'JetBrains Mono', monospace" font-size="6.5" fill="#8E8E9F" text-anchor="middle" letter-spacing="0.2px">SCAN DATA PORTAL</text>
+      </g>
+      <g transform="translate(18, 170)">
+        <text x="0" y="0" class="card-body-text" fill="#FFFFFF" font-size="8.2px">Mudhaliyar St, Vadavalli-Thondamuthur Rd, Coimbatore</text>
+        <text x="0" y="11" class="tamil-tagline">உங்கள் குழந்தையின் எதிர்காலத்தை நாங்கள் உருவாக்குகிறோம் · 641041</text>
+      </g>
+    </g>
+    <text x="40" y="455" class="label-text">PRODUCTION VISITING PROFILE <tspan fill="#5A5A6A">(915x510 px)</tspan></text>
+  </g>
+
+  <g transform="translate(710, 610)">
+    <rect width="640" height="490" fill="none" stroke="#2A2A35" stroke-width="1" opacity="0.4"/>
+    <g transform="translate(40, 75)">
+      <rect width="560" height="260" fill="#08080A" stroke="#141419" stroke-width="2"/>
+      <line x1="40" y1="0" x2="40" y2="260" stroke="#000000" stroke-width="3.5"/>
+      <line x1="120" y1="0" x2="120" y2="260" stroke="#000000" stroke-width="3.5"/>
+      <line x1="200" y1="0" x2="200" y2="260" stroke="#000000" stroke-width="3.5"/>
+      <line x1="280" y1="0" x2="280" y2="260" stroke="#000000" stroke-width="3.5"/>
+      <line x1="360" y1="0" x2="360" y2="260" stroke="#000000" stroke-width="3.5"/>
+      <line x1="440" y1="0" x2="440" y2="260" stroke="#000000" stroke-width="3.5"/>
+      <line x1="520" y1="0" x2="520" y2="260" stroke="#000000" stroke-width="3.5"/>
+      <rect x="30" y="40" width="500" height="180" rx="16" fill="#111115" stroke="#2A2A35" stroke-width="1.5"/>
+      <line x1="60" y1="192" x2="470" y2="192" stroke="#FFCC00" stroke-width="5" stroke-linecap="round" filter="url(#amberGlow)"/>
+      <line x1="60" y1="192" x2="470" y2="192" stroke="#00FFCC" stroke-width="1.5" stroke-linecap="round" filter="url(#cyanGlow)"/>
+      <use href="#uniqueNestLogo" transform="translate(85, 115) scale(1.0)"/>
+      <text x="155" y="128">
+        <tspan class="sign-title-text">ACHIEVERS</tspan>
+        <tspan class="sign-title-text" fill="#FFCC00">NEST</tspan>
+      </text>
+      <g transform="translate(155, 54)">
+        <rect width="295" height="18" rx="4" fill="#0C0C0E" stroke="#00FFCC" stroke-width="0.75"/>
+        <text x="10" y="12" font-family="'JetBrains Mono', monospace" font-weight="500" font-size="7.5" fill="#00FFCC" letter-spacing="0.5px">STATE BOARD · CBSE · MATRIC · ICSE HUB</text>
+      </g>
+    </g>
+    <text x="40" y="450" class="label-text">LASER-LIT PREMIUM SIGNAGE EXTRACTION</text>
+  </g>
+</svg>
