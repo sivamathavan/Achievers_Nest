@@ -11,8 +11,14 @@ import EnquiryForm from './landing/sections/EnquiryForm';
 import LocationContact from './landing/sections/LocationContact';
 import Footer from './landing/components/Footer';
 import FloatingElements from './landing/components/FloatingElements';
+import useSEO from '../../hooks/useSEO';
 
 const LandingPage = () => {
+  useSEO(
+    'Best Tuition Centre in Vadavalli, Coimbatore',
+    'Expert coaching for Class 1-12. State Board, CBSE, Matric & ICSE. Tamil & English medium.'
+  );
+
   // Ensure scroll is at top on load
   useEffect(() => {
     window.scrollTo(0, 0);

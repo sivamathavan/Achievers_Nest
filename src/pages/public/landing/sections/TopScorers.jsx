@@ -85,7 +85,7 @@ const TopScorers = () => {
         <div className={`relative rounded-2xl overflow-hidden animated-border transition-all duration-1000 delay-500 transform ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
           <div className="bg-gradient-to-r from-gold/20 via-yellow-400/20 to-gold/20 p-8 sm:p-10 text-center backdrop-blur-md">
             <h3 className="font-space text-2xl sm:text-3xl font-bold text-white mb-2 text-glow">
-              🎉 2024-25 Results
+              🎉 2025-26 Results
             </h3>
             <p className="text-gold font-medium text-lg sm:text-xl">
               95% of our students scored above 85% in board exams

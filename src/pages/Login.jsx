@@ -3,8 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getRoleFromUserId, generateMockJWT } from '../utils/auth';
 import { User, Lock, Eye, EyeOff, ArrowLeft, Shield, BookOpen, GraduationCap, Users } from 'lucide-react';
+import useSEO from '../hooks/useSEO';
 
 const Login = () => {
+  useSEO('Login', 'Sign in to the Achievers Nest dashboard portal.');
+
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -62,53 +65,95 @@ const Login = () => {
     setError(null);
 
     try {
-      if (!password || password.length < 4) {
-        throw new Error('Password must be at least 4 characters.');
+      if (!password) {
+        throw new Error('Enter your password.');
       }
 
-      if (!userId || userId.length < 4) {
-        throw new Error('Invalid User ID');
+      if (!userId) {
+        throw new Error('Enter your ID.');
       }
-      
-      const role = getRoleFromUserId(userId);
-      if (!role) {
-        throw new Error('Invalid User ID or Password.');
+
+      const cleanId = userId.trim().toLowerCase();
+      let loggedUser = null;
+
+      if (cleanId === 'achievers') {
+        if (password !== '021222') {
+          throw new Error('Invalid Password.');
+        }
+        loggedUser = {
+          id: 'admin-uuid',
+          user_id: 'achievers',
+          name: 'Admin',
+          role: 'Admin'
+        };
+      } else {
+        // Look up in achievers_users
+        const savedUsersRaw = localStorage.getItem('achievers_users');
+        const usersList = savedUsersRaw ? JSON.parse(savedUsersRaw) : [];
+        const foundUser = usersList.find(u => u.id?.toUpperCase() === userId.trim().toUpperCase());
+        
+        if (foundUser) {
+          if (foundUser.password && foundUser.password !== password) {
+            throw new Error('Invalid Password.');
+          }
+          loggedUser = {
+            id: foundUser.id,
+            user_id: foundUser.id,
+            name: foundUser.name,
+            role: foundUser.role,
+            class: foundUser.class,
+            board: foundUser.board,
+            batch: foundUser.batch,
+            parentName: foundUser.parentName,
+            parentPhone: foundUser.parentPhone
+          };
+        } else {
+          // Fallback to role-prefix dynamic testing accounts
+          const role = getRoleFromUserId(userId);
+          if (!role) {
+            throw new Error('Invalid User ID or Password.');
+          }
+          
+          if (password.length < 4) {
+            throw new Error('Password must be at least 4 characters.');
+          }
+
+          const digits = userId.replace(/\D/g, '');
+          const parsedClassNum = parseInt(digits);
+          const studentClass = !isNaN(parsedClassNum) && parsedClassNum >= 1 && parsedClassNum <= 12 
+            ? `Class ${parsedClassNum}` 
+            : 'Class 10';
+
+          loggedUser = {
+            id: userId.toUpperCase(),
+            user_id: userId.toUpperCase(),
+            name: `Mock ${role}`,
+            role: role,
+            class: role === 'Student' ? studentClass : undefined
+          };
+
+          if (role === 'Student') {
+            loggedUser.board = board;
+          }
+
+          if (role === 'Parent') {
+            loggedUser.childName = 'Linked Student';
+            loggedUser.childId = 'STU2024001';
+          }
+        }
       }
 
       // Simulate network
       await new Promise(resolve => setTimeout(resolve, 800));
 
-      const digits = userId.replace(/\D/g, '');
-      const parsedClassNum = parseInt(digits);
-      const studentClass = !isNaN(parsedClassNum) && parsedClassNum >= 1 && parsedClassNum <= 12 
-        ? `Class ${parsedClassNum}` 
-        : 'Class 10';
-
-      const mockUser = {
-        id: 'mock-uuid',
-        user_id: userId.toUpperCase(),
-        name: `Mock ${role}`,
-        role: role,
-        class: role === 'Student' ? studentClass : undefined
-      };
-
-      if (role === 'Student') {
-        mockUser.board = board;
-      }
-
-      if (role === 'Parent') {
-        mockUser.childName = 'Linked Student';
-        mockUser.childId = 'STU2024001';
-      }
-
       if (rememberMe) {
-        localStorage.setItem('rememberedUserId', userId.toUpperCase());
+        localStorage.setItem('rememberedUserId', userId.trim());
       } else {
         localStorage.removeItem('rememberedUserId');
       }
 
-      const token = generateMockJWT(mockUser);
-      login(token, mockUser);
+      const token = generateMockJWT(loggedUser);
+      login(token, loggedUser);
       
       const routes = {
         'Admin': '/admin',
@@ -117,7 +162,7 @@ const Login = () => {
         'Parent': '/parent'
       };
       
-      navigate(routes[role] || '/');
+      navigate(routes[loggedUser.role] || '/');
       
     } catch (err) {
       setError(err.message || 'Invalid User ID or Password. Please try again.');
@@ -203,14 +248,13 @@ const Login = () => {
               </div>
               <input
                 type="text"
-                placeholder="e.g. ADM001"
-                className="w-full bg-white/5 border border-gold/20 rounded-xl py-3.5 pl-12 pr-4 text-[#F0F0F0] text-[16px] tracking-widest uppercase focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all"
+                placeholder="Enter your ID"
+                className="w-full bg-white/5 border border-gold/20 rounded-xl py-3.5 pl-12 pr-4 text-[#F0F0F0] text-[16px] focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all"
                 value={userId}
                 onChange={handleUserIdChange}
                 autoComplete="username"
               />
             </div>
-            <p className="text-[11px] text-white/40 mt-1.5 ml-1">e.g. ADM001, TCH001, STU001</p>
           </div>
           
           {/* Password Field */}
@@ -222,7 +266,7 @@ const Login = () => {
               </div>
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="Enter your Password"
                 className="w-full bg-white/5 border border-gold/20 rounded-xl py-3.5 pl-12 pr-12 text-[#F0F0F0] text-[16px] focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/10 transition-all"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

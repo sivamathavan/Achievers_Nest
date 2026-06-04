@@ -113,7 +113,7 @@ const LocationContact = () => {
               {/* Map embed */}
               <div className="w-full h-full min-h-[400px] rounded-[1.8rem] overflow-hidden relative">
                 <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15665.452391097652!2d76.9024227!3d11.0113824!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba85f7cd00908eb%3A0xc3afc64072fec0a8!2sVadavalli%2C%20Coimbatore%2C%20Tamil%20Nadu!5e0!3m2!1sen!2sin!4v1716912345678!5m2!1sen!2sin" 
+                  src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15663.090333246237!2d76.903623!3d11.0283294!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba85f81e35fa675%3A0x6b1cfc53d0774a3f!2sRturox!5e0!3m2!1sen!2sin!4v1716912345678!5m2!1sen!2sin" 
                   className="w-full h-full border-0 absolute inset-0 filter invert-[90%] hue-rotate-[180deg] opacity-80 mix-blend-screen transition-all duration-500 group-hover:filter-none group-hover:opacity-100 group-hover:mix-blend-normal"
                   allowFullScreen="" 
                   loading="lazy" 
@@ -125,7 +125,7 @@ const LocationContact = () => {
               </div>
               
               <a 
-                href="https://maps.google.com/?q=Vadavalli,+Coimbatore,+Tamil+Nadu+641041" 
+                href="https://www.google.com/maps/search/rturox/@11.0283294,76.903623,13z?entry=ttu&g_ep=EgoyMDI2MDYwMS4wIKXMDSoASAFQAw%3D%3D" 
                 target="_blank" 
                 rel="noreferrer"
                 className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white text-dark-bg font-bold py-3 px-6 rounded-xl shadow-xl hover:scale-105 transition-transform flex items-center whitespace-nowrap z-10"

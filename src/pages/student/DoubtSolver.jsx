@@ -31,6 +31,19 @@ const DoubtSolver = () => {
   const [isTamil, setIsTamil] = useState(false);
   const [history, setHistory] = useState([]);
   
+  const [aiResponse, setAiResponse] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(null);
+
+  // Reset AI states when query is cleared
+  useEffect(() => {
+    if (!searchQuery) {
+      setAiResponse(null);
+      setAiError(null);
+      setAiLoading(false);
+    }
+  }, [searchQuery]);
+
   // Handle ?mode=voice from URL
   useEffect(() => {
     if (location.search.includes('mode=voice') && isSpeechSupported) {
@@ -49,6 +62,69 @@ const DoubtSolver = () => {
       }
     }
   }, []);
+  
+  const askGeminiAI = async (query) => {
+    if (!query.trim()) return;
+    setAiLoading(true);
+    setAiResponse(null);
+    setAiError(null);
+    
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    if (!apiKey || apiKey.includes('your-key')) {
+      setAiError("Gemini AI is not fully configured (missing key in .env.local).");
+      setAiLoading(false);
+      return;
+    }
+    
+    const systemPrompt = `You are a helpful, expert subject tutor for Achievers Nest coaching center. 
+Explain concepts clearly, educationally, and concisely for a student in Class ${classLevel}. 
+If the student asks in Tamil (or Tamil script), reply in Tamil. If in English, reply in English.
+Keep answers accurate, educational, structured, and use Markdown (bolding, bullet points) where appropriate.`;
+
+    const fullPrompt = `${systemPrompt}\n\nStudent Question: ${query}`;
+    
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: fullPrompt
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error(`API returned status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const answer = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!answer) {
+        throw new Error("Empty response from AI model.");
+      }
+      
+      setAiResponse(answer);
+    } catch (err) {
+      console.error(err);
+      setAiError("Failed to get answer from AI. Please check your internet or API key.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -58,7 +134,22 @@ const DoubtSolver = () => {
     setHistory(newHistory);
     localStorage.setItem('achievers_search_history', JSON.stringify(newHistory));
     
-    // Trigger mock search (in a real app, you'd fetch from DB)
+    askGeminiAI(searchQuery);
+  };
+
+  const formatAIResponse = (text) => {
+    if (!text) return '';
+    let html = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+      
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/^\*\s(.*)$/gm, '• $1');
+    html = html.replace(/^- \s(.*)$/gm, '• $1');
+    html = html.replace(/\n/g, '<br/>');
+    
+    return html;
   };
 
   const ALL_QA = [
@@ -181,7 +272,7 @@ const DoubtSolver = () => {
             {history.map((term, i) => (
               <button 
                 key={i} 
-                onClick={() => setSearchQuery(term)}
+                onClick={() => { setSearchQuery(term); askGeminiAI(term); }}
                 className="bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-sm text-white/80 transition-colors"
               >
                 {term}
@@ -192,27 +283,70 @@ const DoubtSolver = () => {
       )}
 
       {/* Results */}
-      {searchQuery && filteredResults.length === 0 ? (
-        <div className="glass-card p-6 text-center">
-          <p className="text-white/60 mb-2 text-sm">No results found for "<span className="text-white">{searchQuery}</span>"</p>
-          <button className="btn-primary py-2 text-sm max-w-xs mx-auto">Ask a Teacher</button>
-        </div>
-      ) : searchQuery ? (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          {filteredResults.map(res => (
-            <div key={res.id} className="glass-card p-5 relative overflow-hidden group">
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-xs font-semibold bg-white/10 text-white/80 px-2 py-1 rounded">
-                  {res.subject} • {res.class}
-                </span>
-                <button className="text-white/30 hover:text-gold transition-colors"><Bookmark size={20} /></button>
-              </div>
-              <h3 className="text-lg font-medium text-white mb-2">{isTamil && res.qTa ? res.qTa : res.q}</h3>
-              <p className="text-white/70 leading-relaxed text-sm">{isTamil && res.aTa ? res.aTa : res.a}</p>
+      {searchQuery && (
+        <div className="space-y-6">
+          {/* AI Tutor Card */}
+          <div className="glass-card p-6 border border-gold/20 relative overflow-hidden bg-gradient-to-r from-gold/5 to-purple-500/5">
+            <div className="absolute top-0 right-0 bg-gradient-to-l from-gold/10 to-transparent p-4 text-[10px] text-gold uppercase tracking-wider font-bold">
+              ✨ Powered by Gemini AI
             </div>
-          ))}
-        </motion.div>
-      ) : null}
+            
+            <h2 className="text-base font-bold text-white mb-4 flex items-center">
+              <span className="animate-pulse mr-2">🔮</span> Achievers AI Tutor
+            </h2>
+            
+            {aiLoading && (
+              <div className="flex flex-col items-center justify-center py-6">
+                <div className="w-8 h-8 border-3 border-gold border-t-transparent rounded-full animate-spin mb-3"></div>
+                <p className="text-xs text-white/50">Analyzing concept and formulating explanation...</p>
+              </div>
+            )}
+            
+            {aiError && (
+              <p className="text-red-400 text-sm py-2">{aiError}</p>
+            )}
+            
+            {aiResponse && (
+              <div 
+                className="text-white/85 leading-relaxed text-sm space-y-2 text-left"
+                dangerouslySetInnerHTML={{ __html: formatAIResponse(aiResponse) }}
+              />
+            )}
+          </div>
+
+          {/* Local database results */}
+          {filteredResults.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-xs font-bold text-white/50 uppercase tracking-widest">Matching Library Questions</h2>
+              {filteredResults.map(res => (
+                <div key={res.id} className="glass-card p-5 relative overflow-hidden group">
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-xs font-semibold bg-white/10 text-white/80 px-2 py-1 rounded">
+                      {res.subject} • {res.class}
+                    </span>
+                    <button className="text-white/30 hover:text-gold transition-colors"><Bookmark size={20} /></button>
+                  </div>
+                  <h3 className="text-lg font-medium text-white mb-2">{isTamil && res.qTa ? res.qTa : res.q}</h3>
+                  <p className="text-white/70 leading-relaxed text-sm">{isTamil && res.aTa ? res.aTa : res.a}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {filteredResults.length === 0 && !aiLoading && !aiResponse && !aiError && (
+            <div className="glass-card p-6 text-center">
+              <p className="text-white/60 mb-2 text-sm">No results found in standard library for "<span className="text-white">{searchQuery}</span>"</p>
+              <button 
+                type="button"
+                onClick={() => askGeminiAI(searchQuery)}
+                className="btn-primary py-2 text-sm max-w-xs mx-auto flex items-center justify-center bg-gold text-dark-bg font-bold"
+              >
+                ✨ Solve with Gemini AI
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       </>
       )}
     </div>

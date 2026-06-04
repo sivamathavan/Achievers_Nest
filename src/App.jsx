@@ -42,6 +42,7 @@ import QAManagement from './pages/admin/QAManagement';
 import ReportsCenter from './pages/admin/ReportsCenter';
 import Announcements from './pages/admin/Announcements';
 import AdminAttendance from './pages/admin/AdminAttendance';
+import NotFound from './pages/public/NotFound';
 
 const App = () => {
   return (
@@ -63,7 +64,7 @@ const App = () => {
               <Route path="reports" element={<ReportsCenter />} />
               <Route path="announcements" element={<Announcements />} />
               <Route path="batch-dna/:id" element={<AcademicDNA forcedClassLevel={10} />} />
-              <Route path="*" element={<div className="text-white">Under Construction</div>} />
+              <Route path="*" element={<NotFound type="construction" />} />
             </Route>
           </Route>
 
@@ -78,7 +79,7 @@ const App = () => {
               <Route path="materials" element={<ContentUpload />} />
               <Route path="attendance" element={<AttendanceMarking />} />
               <Route path="student-dna/:id" element={<AcademicDNA />} />
-              <Route path="*" element={<div className="text-white">Under Construction</div>} />
+              <Route path="*" element={<NotFound type="construction" />} />
             </Route>
           </Route>
 
@@ -110,12 +111,12 @@ const App = () => {
               <Route index element={<ParentDashboard />} />
               <Route path="attendance" element={<ParentAttendance />} />
               <Route path="contacts" element={<ParentContacts />} />
-              <Route path="*" element={<div className="text-white">Under Construction</div>} />
+              <Route path="*" element={<NotFound type="construction" />} />
             </Route>
           </Route>
           
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound type="404" />} />
         </Routes>
       </Router>
     </AuthProvider>

@@ -36,24 +36,24 @@ const NavBar = () => {
   return (
     <nav 
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? 'glass-nav py-3' : 'bg-transparent py-5'
+        scrolled || mobileMenuOpen ? 'glass-nav py-3' : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center flex-nowrap w-full">
           
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => handleNavClick('#home')}>
-            <div className="w-10 h-10 mr-3 flex items-center justify-center">
+          <div className="flex-shrink-0 flex items-center cursor-pointer select-none mr-2" onClick={() => handleNavClick('#home')}>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 mr-1.5 sm:mr-3 flex items-center justify-center flex-shrink-0">
               <img src="/brand/app_icon.svg" alt="Achievers Nest Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="font-space font-bold text-xl tracking-tight text-white hidden sm:block">
+            <span className="font-space font-bold text-[16px] sm:text-xl tracking-tight text-white block flex-shrink-0">
               Achievers Nest
             </span>
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-8 flex-shrink-0">
             {navLinks.map((link) => (
               <button
                 key={link.name}
@@ -74,7 +74,7 @@ const NavBar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
             <button 
               onClick={() => navigate('/login')}
               className="bg-gradient-to-r from-gold to-yellow-400 text-dark-bg font-bold p-2 rounded-full flex items-center transition-all glow-gold-hover"

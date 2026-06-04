@@ -1,7 +1,9 @@
 import React from 'react';
 import { Flame, Target, Zap, Clock, BookOpen, BrainCircuit } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const ProZone = ({ user }) => {
+  const navigate = useNavigate();
   return (
     <div className="space-y-6 pb-20">
       
@@ -28,7 +30,7 @@ const ProZone = ({ user }) => {
 
       {/* Brain Battle & Focus Timer */}
       <div className="grid grid-cols-2 gap-4">
-        <button className="bg-[#00FF88] hover:bg-[#00FF88]/90 text-dark-bg rounded-xl p-4 flex flex-col items-center justify-center transition-all shadow-[0_0_15px_rgba(0,255,136,0.3)]">
+        <button onClick={() => navigate('/student/battle')} className="bg-[#00FF88] hover:bg-[#00FF88]/90 text-dark-bg rounded-xl p-4 flex flex-col items-center justify-center transition-all shadow-[0_0_15px_rgba(0,255,136,0.3)] cursor-pointer">
           <BrainCircuit size={28} className="mb-2" />
           <span className="font-bold uppercase tracking-wider text-sm">Brain Battle</span>
           <span className="text-xs opacity-70">Live Now</span>
@@ -58,11 +60,11 @@ const ProZone = ({ user }) => {
 
       {/* Actions */}
       <div className="grid grid-cols-2 gap-3">
-        <button className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-center justify-center space-x-2 text-white hover:bg-white/10 transition-colors">
+        <button onClick={() => navigate('/student/tests')} className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-center justify-center space-x-2 text-white hover:bg-white/10 transition-colors cursor-pointer">
           <Zap size={16} className="text-[#00FF88]" />
           <span className="text-sm font-medium">Quick Test</span>
         </button>
-        <button className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-center justify-center space-x-2 text-white hover:bg-white/10 transition-colors">
+        <button onClick={() => navigate('/student/doubts')} className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-center justify-center space-x-2 text-white hover:bg-white/10 transition-colors cursor-pointer">
           <BookOpen size={16} className="text-[#00FF88]" />
           <span className="text-sm font-medium">Solve Doubts</span>
         </button>

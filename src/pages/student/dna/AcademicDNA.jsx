@@ -3,6 +3,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { generateMockDNAData, getGeneColor, getGeneColorHex } from '../../../utils/dnaDataGenerator';
 import { Activity, X, Play, HelpCircle, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 // Visual Components
 import DNAHelix from './DNAHelix';
@@ -12,6 +13,7 @@ import MagicGarden from './MagicGarden';
 
 const AcademicDNA = ({ forcedClassLevel = null }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [dnaData, setDnaData] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('All');
   const [selectedGene, setSelectedGene] = useState(null);
@@ -161,10 +163,16 @@ const AcademicDNA = ({ forcedClassLevel = null }) => {
               </div>
 
               <div className="flex space-x-3">
-                <button className="flex-1 bg-gold hover:bg-gold-hover text-dark-bg font-bold py-3 rounded-xl flex items-center justify-center transition-transform active:scale-95">
+                <button
+                  onClick={() => { closeGene(); navigate('/student/tests'); }}
+                  className="flex-1 bg-gold hover:bg-gold-hover text-dark-bg font-bold py-3 rounded-xl flex items-center justify-center transition-transform active:scale-95"
+                >
                   <Play size={18} className="mr-2 fill-current" /> Practice Now
                 </button>
-                <button className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl flex items-center justify-center transition-transform active:scale-95">
+                <button
+                  onClick={() => { closeGene(); navigate('/student/doubts'); }}
+                  className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl flex items-center justify-center transition-transform active:scale-95"
+                >
                   <HelpCircle size={18} className="mr-2" /> View Doubts
                 </button>
               </div>

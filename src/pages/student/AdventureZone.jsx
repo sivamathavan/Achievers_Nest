@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Map, Shield, Sword, Navigation, Trophy, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AdventureZone = ({ user }) => {
+  const navigate = useNavigate();
   return (
     <div className="space-y-6 pb-20">
       
@@ -39,19 +41,19 @@ const AdventureZone = ({ user }) => {
 
       {/* Quick Quests (Actions) */}
       <div className="grid grid-cols-2 gap-3">
-        <button className="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 flex flex-col items-center justify-center transition-colors">
+        <button onClick={() => navigate('/student/tests')} className="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 flex flex-col items-center justify-center transition-colors cursor-pointer">
           <Sword className="text-blue-400 mb-2" size={28} />
           <span className="text-blue-100 font-medium">Daily Trial (Test)</span>
         </button>
-        <button className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl p-4 flex flex-col items-center justify-center transition-colors">
+        <button onClick={() => navigate('/student/doubts')} className="bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl p-4 flex flex-col items-center justify-center transition-colors cursor-pointer">
           <Map className="text-emerald-400 mb-2" size={28} />
           <span className="text-emerald-100 font-medium">Seek Wisdom</span>
         </button>
-        <button className="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl p-4 flex flex-col items-center justify-center transition-colors">
+        <button onClick={() => navigate('/student/planner')} className="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl p-4 flex flex-col items-center justify-center transition-colors cursor-pointer">
           <Navigation className="text-rose-400 mb-2" size={28} />
           <span className="text-rose-100 font-medium">Quest Map</span>
         </button>
-        <button className="bg-gold/10 hover:bg-gold/20 border border-gold/30 rounded-xl p-4 flex flex-col items-center justify-center transition-colors">
+        <button onClick={() => navigate('/student/leaderboard')} className="bg-gold/10 hover:bg-gold/20 border border-gold/30 rounded-xl p-4 flex flex-col items-center justify-center transition-colors cursor-pointer">
           <Trophy className="text-gold mb-2" size={28} />
           <span className="text-gold font-medium">Trophy Room</span>
         </button>
@@ -87,7 +89,7 @@ const AdventureZone = ({ user }) => {
           <h3 className="font-bold text-red-400">Boss Battle Approaching!</h3>
           <p className="text-sm text-red-200/70">Science Unit Test in 2 Days</p>
         </div>
-        <button className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-red-500/20">
+        <button onClick={() => navigate('/student/tests')} className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-red-500/20 cursor-pointer">
           Prepare
         </button>
       </motion.div>

@@ -2,18 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { UserPlus, Users, Upload, CheckCircle, Copy, MessageCircle, FileDown, Search, Edit, Lock, PowerOff, Filter, Save, X, Trash2, ShieldCheck, Mail, Phone, BookOpen, Clock, Image as ImageIcon, Award, Calendar, Book } from 'lucide-react';
 
-const initialMockUsers = [
-  { id: 'STU2024001', name: 'Rahul Sharma', role: 'Student', class: 'Class 10', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024001', parentName: 'Rajesh Sharma', parentPhone: '919876543210', medium: 'English', language: 'Hindi', board: 'CBSE' },
-  { id: 'STU2024002', name: 'Meena S', role: 'Student', class: 'Class 8', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passSTU2024002', parentName: 'Sundar M', parentPhone: '919876543211', medium: 'Tamil', language: 'Tamil', board: 'State Board' },
-  { id: 'TCH001', name: 'John Doe', role: 'Teacher', class: 'Multiple', batch: 'Batch A - Science Kings', status: 'Active', password: 'passTCH001', phone: '919876543220', subjects: 'Physics, Chemistry', salary: 45000, salaryStatus: 'Paid (1st Jun)' },
-  { id: 'TCH002', name: 'Alice Smith', role: 'Teacher', class: 'Multiple', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passTCH002', phone: '919876543221', subjects: 'Mathematics', salary: 48000, salaryStatus: 'Paid (1st Jun)' },
-  { id: 'STU2024003', name: 'Amit Kumar', role: 'Student', class: 'Class 10', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024003', parentName: 'Kishore Kumar', parentPhone: '919876543212', medium: 'English', language: 'Hindi', board: 'CBSE' },
-  { id: 'STU2024004', name: 'Priya Patel', role: 'Student', class: 'Class 10', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passSTU2024004', parentName: 'Dinesh Patel', parentPhone: '919876543213', medium: 'English', language: 'Gujarati', board: 'CBSE' },
-  { id: 'STU2024005', name: 'Sneha Reddy', role: 'Student', class: 'Class 12', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024005', parentName: 'Prasad Reddy', parentPhone: '919876543214', medium: 'English', language: 'Telugu', board: 'CBSE' },
-  { id: 'STU2024006', name: 'Vijay Anand', role: 'Student', class: 'Class 10', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024006', parentName: 'Anand K', parentPhone: '919876543215', medium: 'English', language: 'Tamil', board: 'CBSE' },
-  { id: 'STU2024007', name: 'Anjali Gupta', role: 'Student', class: 'Class 11', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024007', parentName: 'Sanjay Gupta', parentPhone: '919876543216', medium: 'English', language: 'Hindi', board: 'CBSE' },
-  { id: 'STU2024008', name: 'Vikram Singh', role: 'Student', class: 'Class 9', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passSTU2024008', parentName: 'Harbhajan Singh', parentPhone: '919876543217', medium: 'English', language: 'Punjabi', board: 'State Board' },
-];
+const initialMockUsers = [];
 
 const CLASSES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
 const BOARDS = ['CBSE', 'State Board', 'ICSE', 'Matric'];

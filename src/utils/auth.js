@@ -1,5 +1,8 @@
-// Utility to extract role from user_id prefix
 export const getRoleFromUserId = (userId) => {
+  const cleanId = userId.trim().toLowerCase();
+  if (cleanId === 'achievers') {
+    return 'Admin';
+  }
   const prefix = userId.substring(0, 3).toUpperCase();
   
   switch (prefix) {
