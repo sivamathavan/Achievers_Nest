@@ -83,6 +83,35 @@ export const AdminDashboard = () => {
     return attendanceFound ? count : '—';
   }, []);
 
+  const formatTimeAgo = (isoString) => {
+    try {
+      const diffMs = Date.now() - new Date(isoString).getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins} mins ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours} hours ago`;
+      const diffDays = Math.floor(diffHours / 24);
+      return `${diffDays} days ago`;
+    } catch {
+      return 'Some time ago';
+    }
+  };
+
+  const recentActivities = React.useMemo(() => {
+    try {
+      const saved = localStorage.getItem('achievers_activities');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return [
+      { id: 1, description: 'New student Rahul Sharma enrolled in Class 10 CBSE.', type: 'user', timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString() },
+      { id: 2, description: 'Teacher John Doe changed assigned batch details.', type: 'batch', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() }
+    ];
+  }, [storedUsers]);
+
 
   
   return (
@@ -194,22 +223,26 @@ export const AdminDashboard = () => {
           <h2 className="text-sm font-bold text-white mb-5 flex items-center">
             <Activity size={16} className="text-gold mr-2" /> Recent Activity
           </h2>
-          <div className="space-y-3">
-            <div className="flex items-start space-x-3 p-3.5 bg-white/5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
-              <div className="p-2.5 bg-blue-500/10 text-blue-400 rounded-xl"><Users size={16} /></div>
-              <div className="flex-1">
-                <p className="text-[#F0F0F0] text-[13px] leading-relaxed">New student <span className="font-bold text-white">Rahul Sharma</span> enrolled in Class 10 CBSE.</p>
-                <p className="text-[11px] text-white/40 mt-1 uppercase tracking-wider">10 mins ago</p>
+          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1 custom-scrollbar">
+            {recentActivities.slice(0, 10).map(act => (
+              <div key={act.id} className="flex items-start space-x-3 p-3.5 bg-white/5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
+                <div className={`p-2.5 rounded-xl ${
+                  act.type === 'user' ? 'bg-blue-500/10 text-blue-400' :
+                  act.type === 'batch' ? 'bg-gold/10 text-gold' :
+                  act.type === 'attendance' ? 'bg-[#00FF88]/10 text-[#00FF88]' :
+                  'bg-white/10 text-white/60'
+                }`}>
+                  {act.type === 'user' ? <Users size={16} /> : <Activity size={16} />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-[#F0F0F0] text-[13px] leading-relaxed">{act.description}</p>
+                  <p className="text-[11px] text-white/40 mt-1 uppercase tracking-wider">{formatTimeAgo(act.timestamp)}</p>
+                </div>
               </div>
-            </div>
-
-            <div className="flex items-start space-x-3 p-3.5 bg-white/5 rounded-2xl border border-white/5 hover:border-white/10 transition-colors">
-              <div className="p-2.5 bg-gold/10 text-gold rounded-xl"><Activity size={16} /></div>
-              <div className="flex-1">
-                <p className="text-[#F0F0F0] text-[13px] leading-relaxed">Teacher John published <span className="font-bold text-white">Optics Weekly Test</span> for Batch A.</p>
-                <p className="text-[11px] text-white/40 mt-1 uppercase tracking-wider">2 hours ago</p>
-              </div>
-            </div>
+            ))}
+            {recentActivities.length === 0 && (
+              <p className="text-center py-6 text-white/40 text-sm">No recent activities recorded.</p>
+            )}
           </div>
         </div>
 

@@ -1,25 +1,39 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as XLSX from 'xlsx';
-import { UserPlus, Users, Upload, CheckCircle, Copy, MessageCircle, FileDown, Search, Edit, Lock, PowerOff, Filter, Save, X, Trash2 } from 'lucide-react';
+import { UserPlus, Users, Upload, CheckCircle, Copy, MessageCircle, FileDown, Search, Edit, Lock, PowerOff, Filter, Save, X, Trash2, ShieldCheck, Mail, Phone, BookOpen, Clock } from 'lucide-react';
 
 const initialMockUsers = [
-  { id: 'STU2024001', name: 'Rahul Sharma', role: 'Student', class: 'Class 10', batch: 'Batch A - Morning', status: 'Active' },
-  { id: 'STU2024002', name: 'Meena S', role: 'Student', class: 'Class 8', batch: 'Batch B - Evening', status: 'Active' },
-  { id: 'TCH001', name: 'John Doe', role: 'Teacher', class: 'Multiple', batch: 'Batch A - Morning, Batch C - Evening', status: 'Active' },
-  { id: 'TCH002', name: 'Alice Smith', role: 'Teacher', class: 'Multiple', batch: 'Batch B - Evening', status: 'Active' },
-  { id: 'STU2024003', name: 'Amit Kumar', role: 'Student', class: 'Class 10', batch: 'Batch A - Morning', status: 'Active' },
-  { id: 'STU2024004', name: 'Priya Patel', role: 'Student', class: 'Class 10', batch: 'Batch B - Evening', status: 'Active' },
-  { id: 'STU2024005', name: 'Sneha Reddy', role: 'Student', class: 'Class 12', batch: 'Batch A - Morning', status: 'Active' },
-  { id: 'STU2024006', name: 'Vijay Anand', role: 'Student', class: 'Class 10', batch: 'Batch A - Morning', status: 'Active' },
-  { id: 'STU2024007', name: 'Anjali Gupta', role: 'Student', class: 'Class 11', batch: 'Batch C - Morning', status: 'Active' },
-  { id: 'STU2024008', name: 'Vikram Singh', role: 'Student', class: 'Class 9', batch: 'Batch B - Evening', status: 'Active' },
-  { id: 'STU2024009', name: 'Pooja Hegde', role: 'Student', class: 'Class 10', batch: 'Batch A - Morning', status: 'Active' },
-  { id: 'STU2024010', name: 'Karthik Raja', role: 'Student', class: 'Class 10', batch: 'Batch D - Evening', status: 'Active' },
+  { id: 'STU2024001', name: 'Rahul Sharma', role: 'Student', class: 'Class 10', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024001', parentName: 'Rajesh Sharma', parentPhone: '919876543210', medium: 'English', language: 'Hindi', board: 'CBSE' },
+  { id: 'STU2024002', name: 'Meena S', role: 'Student', class: 'Class 8', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passSTU2024002', parentName: 'Sundar M', parentPhone: '919876543211', medium: 'Tamil', language: 'Tamil', board: 'State Board' },
+  { id: 'TCH001', name: 'John Doe', role: 'Teacher', class: 'Multiple', batch: 'Batch A - Science Kings', status: 'Active', password: 'passTCH001', phone: '919876543220', subjects: 'Physics, Chemistry' },
+  { id: 'TCH002', name: 'Alice Smith', role: 'Teacher', class: 'Multiple', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passTCH002', phone: '919876543221', subjects: 'Mathematics' },
+  { id: 'STU2024003', name: 'Amit Kumar', role: 'Student', class: 'Class 10', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024003', parentName: 'Kishore Kumar', parentPhone: '919876543212', medium: 'English', language: 'Hindi', board: 'CBSE' },
+  { id: 'STU2024004', name: 'Priya Patel', role: 'Student', class: 'Class 10', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passSTU2024004', parentName: 'Dinesh Patel', parentPhone: '919876543213', medium: 'English', language: 'Gujarati', board: 'CBSE' },
+  { id: 'STU2024005', name: 'Sneha Reddy', role: 'Student', class: 'Class 12', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024005', parentName: 'Prasad Reddy', parentPhone: '919876543214', medium: 'English', language: 'Telugu', board: 'CBSE' },
+  { id: 'STU2024006', name: 'Vijay Anand', role: 'Student', class: 'Class 10', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024006', parentName: 'Anand K', parentPhone: '919876543215', medium: 'English', language: 'Tamil', board: 'CBSE' },
+  { id: 'STU2024007', name: 'Anjali Gupta', role: 'Student', class: 'Class 11', batch: 'Batch A - Science Kings', status: 'Active', password: 'passSTU2024007', parentName: 'Sanjay Gupta', parentPhone: '919876543216', medium: 'English', language: 'Hindi', board: 'CBSE' },
+  { id: 'STU2024008', name: 'Vikram Singh', role: 'Student', class: 'Class 9', batch: 'Batch B - Math Wizards', status: 'Active', password: 'passSTU2024008', parentName: 'Harbhajan Singh', parentPhone: '919876543217', medium: 'English', language: 'Punjabi', board: 'State Board' },
 ];
 
 const CLASSES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
 const BOARDS = ['CBSE', 'State Board', 'ICSE', 'Matric'];
-const BATCH_OPTIONS = ['Batch A - Morning', 'Batch B - Evening', 'Batch C - Morning', 'Batch D - Evening'];
+
+const logActivity = (description, type = 'general') => {
+  try {
+    const saved = localStorage.getItem('achievers_activities');
+    const activities = saved ? JSON.parse(saved) : [];
+    const newActivity = {
+      id: Date.now(),
+      description,
+      type,
+      timestamp: new Date().toISOString()
+    };
+    const updated = [newActivity, ...activities].slice(0, 50);
+    localStorage.setItem('achievers_activities', JSON.stringify(updated));
+  } catch (e) {
+    console.error('Error logging activity', e);
+  }
+};
 
 // Generate next sequential ID for Students
 const generateNextStudentId = (existingUsers) => {
@@ -58,11 +72,26 @@ const UserManagement = () => {
     localStorage.setItem('achievers_users', JSON.stringify(users));
   }, [users]);
 
+  // Load batch options dynamically from local storage
+  const batchOptions = useMemo(() => {
+    try {
+      const saved = localStorage.getItem('achievers_batches');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.length > 0) {
+          return parsed.map(b => b.name);
+        }
+      }
+    } catch {}
+    return ['Batch A - Science Kings', 'Batch B - Math Wizards'];
+  }, []);
+
   // Form States
-  const [studentForm, setStudentForm] = useState({ name: '', class: 'Class 10', board: 'CBSE', medium: 'English', language: 'Tamil', parentName: '', parentPhone: '', batch: 'Batch A - Morning' });
+  const [studentForm, setStudentForm] = useState({ name: '', class: 'Class 10', board: 'CBSE', medium: 'English', language: 'Tamil', parentName: '', parentPhone: '', batch: batchOptions[0] || '' });
   const [teacherForm, setTeacherForm] = useState({ name: '', phone: '', subjects: '', batches: [] });
   
   const [generatedCreds, setGeneratedCreds] = useState(null);
+  const [selectedUserDetail, setSelectedUserDetail] = useState(null);
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -90,17 +119,48 @@ const UserManagement = () => {
     e.preventDefault();
     const newId = generateNextStudentId(users);
     const newPass = generateRandomPassword();
+    
+    const newStudent = { 
+      id: newId, 
+      name: studentForm.name, 
+      role: 'Student', 
+      class: studentForm.class, 
+      board: studentForm.board,
+      medium: studentForm.medium,
+      language: studentForm.language,
+      parentName: studentForm.parentName,
+      parentPhone: studentForm.parentPhone,
+      batch: studentForm.batch, 
+      status: 'Active',
+      password: newPass
+    };
+
     setGeneratedCreds({ id: newId, password: newPass, name: studentForm.name, phone: studentForm.parentPhone });
-    setUsers([{ id: newId, name: studentForm.name, role: 'Student', class: studentForm.class, batch: studentForm.batch, status: 'Active' }, ...users]);
+    setUsers(prev => [newStudent, ...prev]);
+    logActivity(`Created new student account: ${studentForm.name} (${newId})`, 'user');
   };
 
   const handleCreateTeacher = (e) => {
     e.preventDefault();
     const newId = generateNextTeacherId(users);
     const newPass = generateRandomPassword();
-    setGeneratedCreds({ id: newId, password: newPass, name: teacherForm.name, phone: teacherForm.phone });
     const assignedBatches = teacherForm.batches.length > 0 ? teacherForm.batches.join(', ') : 'Unassigned';
-    setUsers([{ id: newId, name: teacherForm.name, role: 'Teacher', class: 'Multiple', batch: assignedBatches, status: 'Active' }, ...users]);
+    
+    const newTeacher = { 
+      id: newId, 
+      name: teacherForm.name, 
+      role: 'Teacher', 
+      class: 'Multiple', 
+      batch: assignedBatches, 
+      status: 'Active',
+      password: newPass,
+      phone: teacherForm.phone,
+      subjects: teacherForm.subjects
+    };
+
+    setGeneratedCreds({ id: newId, password: newPass, name: teacherForm.name, phone: teacherForm.phone });
+    setUsers(prev => [newTeacher, ...prev]);
+    logActivity(`Created new teacher account: ${teacherForm.name} (${newId})`, 'user');
   };
 
   const toggleTeacherBatch = (batch) => {
@@ -113,8 +173,11 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = (id) => {
-    if (window.confirm(`Are you sure you want to deactivate and remove user ${id}?`)) {
+    const target = users.find(u => u.id === id);
+    if (!target) return;
+    if (window.confirm(`Are you sure you want to delete user ${target.name} (${id})?`)) {
       setUsers(users.filter(u => u.id !== id));
+      logActivity(`Deleted user account: ${target.name} (${id})`, 'user');
     }
   };
 
@@ -125,6 +188,7 @@ const UserManagement = () => {
 
   const saveEditUser = () => {
     setUsers(users.map(u => u.id === editingUserId ? { ...u, ...editFormData } : u));
+    logActivity(`Updated user account details for ${editFormData.name || editingUserId}`, 'user');
     setEditingUserId(null);
   };
 
@@ -144,10 +208,25 @@ const UserManagement = () => {
     window.open(url, '_blank');
   };
 
+  const shareDetailsViaWhatsApp = (userToShare) => {
+    const pass = userToShare.password || 'achievers123';
+    const text = `Hello ${userToShare.name},\nHere are your login credentials for Achievers Nest:\nUser ID: ${userToShare.id}\nPassword/Passkey: ${pass}\nUrl: https://achieversnest.in`;
+    const phone = userToShare.parentPhone || userToShare.phone || '';
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
   const copyCredentials = () => {
     const text = `User ID: ${generatedCreds.id}\nPassword: ${generatedCreds.password}`;
     navigator.clipboard.writeText(text);
     alert('Copied to clipboard!');
+  };
+
+  const copyUserDetails = (userToCopy) => {
+    const pass = userToCopy.password || 'achievers123';
+    const text = `User ID: ${userToCopy.id}\nPassword/Passkey: ${pass}`;
+    navigator.clipboard.writeText(text);
+    alert('Credentials copied to clipboard!');
   };
 
   const handleBulkImport = (e) => {
@@ -168,7 +247,7 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="space-y-6 pb-20 max-w-6xl mx-auto">
+    <div className="space-y-6 pb-20 max-w-6xl mx-auto relative">
       <header className="flex flex-col md:flex-row md:justify-between md:items-end space-y-4 md:space-y-0">
         <div>
           <h1 className="text-2xl font-bold text-white">User Management</h1>
@@ -228,9 +307,9 @@ const UserManagement = () => {
                   <input type="text" placeholder="e.g. 919876543210" required value={studentForm.parentPhone} onChange={e=>setStudentForm({...studentForm, parentPhone:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none" />
                 </div>
                 <div>
-                  <label className="text-xs text-white/40 uppercase block mb-1">Assign Batch (Morning / Evening)</label>
+                  <label className="text-xs text-white/40 uppercase block mb-1">Assign Batch</label>
                   <select value={studentForm.batch} onChange={e=>setStudentForm({...studentForm, batch:e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:border-gold outline-none">
-                    {BATCH_OPTIONS.map(b => <option key={b} className="bg-dark-bg">{b}</option>)}
+                    {batchOptions.map(b => <option key={b} className="bg-dark-bg">{b}</option>)}
                   </select>
                 </div>
               </div>
@@ -293,7 +372,7 @@ const UserManagement = () => {
                 <div>
                   <label className="text-xs text-white/40 uppercase block mb-1">Assign to Batches (Multiple)</label>
                   <div className="grid grid-cols-2 gap-2 mt-1">
-                    {BATCH_OPTIONS.map(batch => (
+                    {batchOptions.map(batch => (
                       <button 
                         key={batch} type="button" 
                         onClick={() => toggleTeacherBatch(batch)}
@@ -372,7 +451,7 @@ const UserManagement = () => {
                 <div className="flex items-center bg-white/5 border border-white/10 rounded-xl px-3 py-1.5">
                   <select value={filterBatch} onChange={e => setFilterBatch(e.target.value)} className="bg-transparent text-sm text-white/80 outline-none w-32 truncate">
                     <option value="All" className="bg-dark-bg">All Batches</option>
-                    {BATCH_OPTIONS.map(b => <option key={b} value={b} className="bg-dark-bg">{b}</option>)}
+                    {batchOptions.map(b => <option key={b} value={b} className="bg-dark-bg">{b}</option>)}
                   </select>
                 </div>
               </div>
@@ -414,11 +493,21 @@ const UserManagement = () => {
                       );
                     }
                     return paginatedUsers.map((user) => (
-                      <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <tr 
+                        key={user.id} 
+                        className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                        onClick={() => setSelectedUserDetail(user)}
+                      >
                         <td className="px-6 py-4 font-mono text-gold">{user.id}</td>
                         <td className="px-6 py-4 font-medium text-white">
                           {editingUserId === user.id ? (
-                            <input type="text" value={editFormData.name} onChange={e => setEditFormData({...editFormData, name: e.target.value})} className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none" />
+                            <input 
+                              type="text" 
+                              value={editFormData.name} 
+                              onClick={e => e.stopPropagation()}
+                              onChange={e => setEditFormData({...editFormData, name: e.target.value})} 
+                              className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none" 
+                            />
                           ) : user.name}
                         </td>
                         <td className="px-6 py-4">
@@ -428,7 +517,12 @@ const UserManagement = () => {
                         </td>
                         <td className="px-6 py-4">
                           {editingUserId === user.id && user.role !== 'Teacher' ? (
-                             <select value={editFormData.class} onChange={e => setEditFormData({...editFormData, class: e.target.value})} className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none w-full max-w-[120px]">
+                             <select 
+                               value={editFormData.class} 
+                               onClick={e => e.stopPropagation()}
+                               onChange={e => setEditFormData({...editFormData, class: e.target.value})} 
+                               className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none w-full max-w-[120px]"
+                             >
                                {CLASSES.map(c => <option key={c} value={c} className="bg-dark-bg">{c}</option>)}
                              </select>
                           ) : (
@@ -440,7 +534,12 @@ const UserManagement = () => {
                         </td>
                         <td className="px-6 py-4">
                           {editingUserId === user.id ? (
-                            <select value={editFormData.status} onChange={e => setEditFormData({...editFormData, status: e.target.value})} className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none">
+                            <select 
+                              value={editFormData.status} 
+                              onClick={e => e.stopPropagation()}
+                              onChange={e => setEditFormData({...editFormData, status: e.target.value})} 
+                              className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm outline-none"
+                            >
                                <option value="Active" className="bg-dark-bg">Active</option>
                                <option value="Inactive" className="bg-dark-bg">Inactive</option>
                              </select>
@@ -450,7 +549,7 @@ const UserManagement = () => {
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
                           {editingUserId === user.id ? (
                             <div className="flex justify-end space-x-2">
                                <button onClick={saveEditUser} className="p-2 bg-[#00FF88]/20 hover:bg-[#00FF88]/30 rounded text-[#00FF88]" title="Save"><Save size={14}/></button>
@@ -459,7 +558,7 @@ const UserManagement = () => {
                           ) : (
                             <div className="flex justify-end space-x-2">
                               <button onClick={() => startEditUser(user)} className="p-2 bg-white/5 hover:bg-white/10 rounded border border-white/10 text-white/60 hover:text-white" title="Edit User"><Edit size={14}/></button>
-                              <button className="p-2 bg-white/5 hover:bg-white/10 rounded border border-white/10 text-white/60 hover:text-gold" title="Reset Password"><Lock size={14}/></button>
+                              <button onClick={() => copyUserDetails(user)} className="p-2 bg-white/5 hover:bg-white/10 rounded border border-white/10 text-white/60 hover:text-gold" title="Copy Credentials"><Lock size={14}/></button>
                               <button onClick={() => handleDeleteUser(user.id)} className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded border border-red-500/20 text-red-400" title="Delete"><Trash2 size={14}/></button>
                             </div>
                           )}
@@ -498,6 +597,137 @@ const UserManagement = () => {
             )}
           </div>
           
+        </div>
+      )}
+
+      {/* USER DETAILS MODAL */}
+      {selectedUserDetail && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-card max-w-2xl w-full p-6 md:p-8 border border-white/10 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-2xl bg-gold/10 flex items-center justify-center text-gold font-bold text-lg border border-gold/25">
+                  {selectedUserDetail.name.charAt(0)}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">{selectedUserDetail.name}</h3>
+                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
+                    selectedUserDetail.role === 'Teacher' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/20' : 'bg-gold/20 text-gold border border-gold/20'
+                  }`}>
+                    {selectedUserDetail.role}
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedUserDetail(null)}
+                className="p-2 hover:bg-white/10 rounded-xl text-white/60 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-b border-white/10 py-6 my-6">
+              
+              {/* Credentials / System details */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Portal Credentials</h4>
+                <div>
+                  <p className="text-xs text-white/40 mb-0.5">User ID</p>
+                  <p className="text-sm font-mono font-bold text-gold">{selectedUserDetail.id}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-white/40 mb-0.5">Password / Passkey</p>
+                  <p className="text-sm font-mono font-bold text-white bg-white/5 px-2 py-1 rounded inline-block">
+                    {selectedUserDetail.password || 'achievers123'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-white/40 mb-0.5">Account Status</p>
+                  <span className={`inline-flex items-center text-xs font-semibold ${selectedUserDetail.status === 'Active' ? 'text-[#00FF88]' : 'text-red-400'}`}>
+                    <span className={`w-2 h-2 rounded-full mr-1.5 ${selectedUserDetail.status === 'Active' ? 'bg-[#00FF88]' : 'bg-red-400'}`}></span>
+                    {selectedUserDetail.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Profile Details */}
+              <div className="space-y-4 border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
+                <h4 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Profile Information</h4>
+                
+                {selectedUserDetail.role === 'Student' ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-white/40 mb-0.5">Class</p>
+                        <p className="text-sm text-white font-medium">{selectedUserDetail.class}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-white/40 mb-0.5">Board</p>
+                        <p className="text-sm text-white font-medium">{selectedUserDetail.board || 'CBSE'}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-white/40 mb-0.5">Medium</p>
+                        <p className="text-sm text-white font-medium">{selectedUserDetail.medium || 'English'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-white/40 mb-0.5">Language</p>
+                        <p className="text-sm text-white font-medium">{selectedUserDetail.language || 'Tamil'}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs text-white/40 mb-0.5">Parent Details</p>
+                      <p className="text-sm text-white font-medium">{selectedUserDetail.parentName || '—'}</p>
+                      <p className="text-xs text-white/50 mt-0.5 flex items-center">
+                        <Phone size={10} className="mr-1" /> {selectedUserDetail.parentPhone || '—'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-white/40 mb-0.5">Assigned Batch</p>
+                      <p className="text-sm text-gold font-bold">{selectedUserDetail.batch || 'Unassigned'}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <p className="text-xs text-white/40 mb-0.5">Phone Number</p>
+                      <p className="text-sm text-white font-medium flex items-center">
+                        <Phone size={12} className="mr-1 text-white/40" /> {selectedUserDetail.phone || '—'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-white/40 mb-0.5">Subjects Expertise</p>
+                      <p className="text-sm text-white font-medium">{selectedUserDetail.subjects || 'General'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-white/40 mb-0.5">Assigned Batches</p>
+                      <p className="text-sm text-gold font-bold">{selectedUserDetail.batch || 'Unassigned'}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex space-x-3">
+              <button 
+                onClick={() => copyUserDetails(selectedUserDetail)}
+                className="flex-1 bg-white/10 hover:bg-white/20 text-white font-semibold py-3 rounded-xl transition-colors text-sm flex items-center justify-center"
+              >
+                <Copy size={16} className="mr-2" /> Copy Login Info
+              </button>
+              {(selectedUserDetail.parentPhone || selectedUserDetail.phone) && (
+                <button 
+                  onClick={() => shareDetailsViaWhatsApp(selectedUserDetail)}
+                  className="flex-1 bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center"
+                >
+                  <MessageCircle size={16} className="mr-2" /> Share via WhatsApp
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

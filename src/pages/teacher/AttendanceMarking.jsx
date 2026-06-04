@@ -243,6 +243,22 @@ const MarkStep = ({ batch, date, onBack, onSaved }) => {
   const handleSave = async () => {
     setSaving(true);
     await new Promise(r => setTimeout(r, 800));
+    
+    try {
+      const saved = localStorage.getItem('achievers_activities');
+      const activities = saved ? JSON.parse(saved) : [];
+      const newActivity = {
+        id: Date.now(),
+        description: `Attendance marked for batch "${batch.name}" on ${new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { day:'numeric', month:'short' })}.`,
+        type: 'attendance',
+        timestamp: new Date().toISOString()
+      };
+      const updated = [newActivity, ...activities].slice(0, 50);
+      localStorage.setItem('achievers_activities', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error logging attendance marking', e);
+    }
+
     setSaving(false);
     setSaved(true);
     onSaved();
