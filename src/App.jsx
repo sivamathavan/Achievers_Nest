@@ -41,6 +41,7 @@ import BatchManagement from './pages/admin/BatchManagement';
 import QAManagement from './pages/admin/QAManagement';
 import ReportsCenter from './pages/admin/ReportsCenter';
 import Announcements from './pages/admin/Announcements';
+import AdminAttendance from './pages/admin/AdminAttendance';
 
 const App = () => {
   return (
@@ -57,6 +58,7 @@ const App = () => {
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="batches" element={<BatchManagement />} />
+              <Route path="attendance" element={<AdminAttendance />} />
               <Route path="qa" element={<QAManagement />} />
               <Route path="reports" element={<ReportsCenter />} />
               <Route path="announcements" element={<Announcements />} />

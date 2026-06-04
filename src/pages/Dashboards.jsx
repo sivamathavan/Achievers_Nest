@@ -52,6 +52,37 @@ export const AdminDashboard = () => {
     return count > 0 ? count : 12;
   }, [storedUsers]);
 
+  const activeNow = React.useMemo(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    let count = 0;
+    let batchIds = ['b1', 'b2'];
+    try {
+      const savedBatches = localStorage.getItem('achievers_batches');
+      if (savedBatches) {
+        const parsed = JSON.parse(savedBatches);
+        parsed.forEach(b => {
+          batchIds.push(String(b.id));
+          batchIds.push(`b${b.id}`);
+        });
+      }
+    } catch {}
+    
+    batchIds = Array.from(new Set(batchIds));
+    let attendanceFound = false;
+
+    batchIds.forEach(bId => {
+      try {
+        const raw = localStorage.getItem(`attendance_${bId}_${todayStr}`);
+        if (raw) {
+          attendanceFound = true;
+          const data = JSON.parse(raw || '{}');
+          count += Object.values(data).filter(v => v === 'P').length;
+        }
+      } catch {}
+    });
+    return attendanceFound ? count : '—';
+  }, []);
+
 
   
   return (
@@ -95,9 +126,9 @@ export const AdminDashboard = () => {
         
         <div className="bg-[#12121A] border border-white/5 rounded-[20px] p-4 md:p-5 relative overflow-hidden group hover:border-gold/30 transition-colors">
           <div className="flex items-center text-white/50 text-[11px] font-bold uppercase tracking-wider mb-2">
-            <Activity size={14} className="mr-1.5 text-gold" /> Active Now
+            <Activity size={14} className="mr-1.5 text-gold" /> {activeNow === '—' ? 'Present Today' : 'Active Now'}
           </div>
-          <div className="text-2xl md:text-3xl font-bold text-white font-space">48</div>
+          <div className="text-2xl md:text-3xl font-bold text-white font-space">{activeNow}</div>
           <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
             <Activity size={80} />
           </div>
