@@ -23,11 +23,7 @@ const enrollmentData = [
   { month: 'Jun', students: 245 },
 ];
 
-const boardData = [
-  { name: 'CBSE', value: 145, color: '#FFD700' },
-  { name: 'State Board', value: 80, color: '#00FF88' },
-  { name: 'ICSE', value: 20, color: '#FF6B6B' },
-];
+
 
 export const AdminDashboard = () => {
   const { user } = useAuth();
@@ -92,6 +88,33 @@ export const AdminDashboard = () => {
   const teacherCount = React.useMemo(() => {
     return storedUsers.filter(u => u.role === 'Teacher').length;
   }, [storedUsers]);
+
+  const boardData = React.useMemo(() => {
+    const students = storedUsers.filter(u => u.role === 'Student');
+    const counts = {};
+    students.forEach(s => {
+      const b = s.board || 'CBSE';
+      counts[b] = (counts[b] || 0) + 1;
+    });
+    
+    const boardNames = ['CBSE', 'State Board', 'ICSE', 'Matric'];
+    const colors = {
+      'CBSE': '#FFD700',
+      'State Board': '#00FF88',
+      'ICSE': '#FF6B6B',
+      'Matric': '#A78BFA'
+    };
+    
+    return boardNames.map(name => ({
+      name,
+      value: counts[name] || 0,
+      color: colors[name] || '#FFFFFF'
+    }));
+  }, [storedUsers]);
+
+  const boardTotal = React.useMemo(() => {
+    return boardData.reduce((sum, item) => sum + item.value, 0);
+  }, [boardData]);
 
   const activeNow = React.useMemo(() => {
     const todayStr = new Date().toISOString().split('T')[0];
@@ -218,19 +241,27 @@ export const AdminDashboard = () => {
         <div className="bg-[#12121A] border border-white/5 rounded-[24px] p-5 md:p-6">
           <h2 className="text-xs font-bold uppercase tracking-wider text-white/60 mb-2">Board Distribution</h2>
           <div className="h-[180px] w-full relative">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={boardData} cx="50%" cy="50%" innerRadius={55} outerRadius={75} paddingAngle={5} dataKey="value" stroke="none">
-                  {boardData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <RechartsTooltip contentStyle={{ backgroundColor: '#0A0A0F', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
-              </PieChart>
-            </ResponsiveContainer>
+            {boardTotal > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={boardData} cx="50%" cy="50%" innerRadius={55} outerRadius={75} paddingAngle={5} dataKey="value" stroke="none">
+                    {boardData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip contentStyle={{ backgroundColor: '#0A0A0F', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="w-[130px] h-[130px] rounded-full border border-white/5 flex items-center justify-center">
+                  <div className="w-[90px] h-[90px] rounded-full border border-white/5"></div>
+                </div>
+              </div>
+            )}
             {/* Center Label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span className="text-2xl font-bold text-white">245</span>
+              <span className="text-2xl font-bold text-white">{boardTotal}</span>
               <span className="text-[10px] text-white/40 uppercase tracking-widest">Total</span>
             </div>
           </div>
